@@ -1,0 +1,1127 @@
+<html>
+<head>
+  <meta name="Author" content="Ignacio P&eacute;rez Gil">
+  <meta HTTP-EQUIV="Contents" content="Isomot">
+  <meta HTTP-EQUIV="Keywords" content="Isomot">
+  <title>Isomot v1.0</title>
+</head>
+<body bgcolor="#C0C0C0">
+<font face="Times New Roman,Times">
+
+
+<table width="100%">
+<tr>
+<td valign="center" width="20%">
+<center><a href="http://retrospec.sgn.net"><img src="images/retrspec.gif" nosave border=0></a></center>
+</td>
+<td valign="center" width="60%">
+<center><a href="http://retrospec.sgn.net/users/ignacio/princ.htm"><img src="images/l.gif" nosave border=0></a></center>
+</td>
+<td valign="center" width="20%">
+<center><a href="IsomotEng.htm"><img src="images/ving.gif" nosave border=0 height=32 width=32><br>
+English version</a></center>
+</td>
+</tr>
+</table>
+<hr width="100%">
+<center><img src="images/isologo.gif" nosave border=0 height=182 width=168></center><br>
+<font size=4>
+Isomot v1.0 por Ignacio P&eacute;rez Gil (perezg_ret@terra.es)<br>
+<br>
+- <a href="#que">&iquest;Que es Isomot?</a><br>
+- <a href="#dist">Notas sobre la distribuci&oacute;n</a><br>
+- <a href="#inst">C&oacute;mo usar Isomot en tu proyecto Allegro</a><br>
+- <a href="#rej">La rejilla</a><br>
+- <a href="#par">Paredes y losetas</a><br>
+- <a href="#obj">Objetos</a><br>
+- <a href="#col">Detecci&oacute;n de colisiones</a><br>
+- <a href="#coorej">Coordenadas de la rejilla</a><br>
+- <a href="#convc">Convirtiendo coordenadas de entre 2d y 3d</a><br>
+- <a href="#somb">Sombras</a><br>
+- <a href="#transp">Objetos transparentes</a><br>
+- <a href="#dib">Dibujando la vista isom&eacute;trica</a><br>
+- <a href="#err">Errores</a><br>
+- <a href="#lng">El fichero ism_lng.h</a><br>
+- <a href="#glos">Resumen de funciones</a><br>
+- <a href="#cons">Consejos</a><br>
+- <a href="#hist">Historia</a><br>
+- <a href="#agr">Agradecimientos</a><br>
+<br>
+<br>
+- <a name="que"></a>&iquest;Que es Isomot?</font><br>
+<br>
+<font>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Isomot es un motor de gr&aacute;ficos isom&eacute;tricos para Allegro, en la m&aacute;s genuina tradici&oacute;n del Filmation (&iquest;recuerdas juegos como Knight Lore, Alien 8, Sweevo's World, Head Over Hells, etc?) con una perspectiva 1/2,1/2,1 y donde el eje x es el que va hacia abajo y a la derecha, el y hacia abajo y a la izquierda, y el z hacia arriba. Este documento no pretende ser un tutorial sobre la perspectiva isom&eacute;trica, as&iacute; que supondr&eacute; que tienes unos conocimientos b&aacute;sicos sobre la misma. De todas formas, para cualquier pregunta, me puedes escribir a <a href="mailto:perezg_ret@terra.es">perezg_ret@terra.es</a>. Isomot tiene un interface multilingüe; espa&ntilde;ol e ingl&eacute;s son los lenguajes soportados actualmente (este documento solo trata el interface en espa&ntilde;ol). A&ntilde;adir nuevos lenguajes al interface es muy f&aacute;cil, si quieres hacer el interface para alg&uacute;n otro lenguaje, m&aacute;ndame un mensaje y te dir&eacute; como.<br>
+<br>
+<br>
+<font size=4>- <a name="dist"></a>Notas sobre la distribuci&oacute;n</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Este c&oacute;digo fuente es distribuido "tal cual", sin ninguna garant&iacute;a, y no aceptar&eacute; ning&uacute;n tipo de responsabilidad por ning&uacute;n tipo de da&ntilde;o que pueda causar.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eres libre de usarlo en tus propios programas, tal cual o a&ntilde;adi&eacute;ndole modificaciones de tu propia cosecha, <b>siempre que no sea con motivos comerciales</b>. Eso s&iacute;, una menci&oacute;n en los cr&eacute;ditos, y un peque&ntilde;o correo electr&oacute;nico dici&eacute;ndome para qu&eacute; lo est&aacute;s usando, lo que piensas de &eacute;l, los cambios que le has hecho, etc. ser&iacute;a muy amable por tu parte :)<br>
+<br>
+<br>
+<font size=4>- <a name="inst"></a>C&oacute;mo usar Isomot en tu proyecto Allegro</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para usar Isomot, s&oacute;lo tienes que a&ntilde;adir el fichero isomot.c a tu proyecto (y no olvides el #include "isomot.h" en el fichero o ficheros en los que lo vayas a usar). F&aacute;cil, &iquest;verdad?<br>
+<br>
+<br>
+<font size=4>- <a name="rej"></a>La rejilla</font><br>
+<br><a name="f11"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Las habitaciones de cualquier juego isom&eacute;trico t&iacute;pico tienen una rejilla sobre la cu&aacute;l casi todos los objetos est&aacute;n colocados. Para definir esta rejilla, debes usar la siguiente funci&oacute;n:<br><br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_establecer_rejilla(int x, int y, int anchura);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Define (o redefine) la rejilla.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: las dimensiones de la rejilla.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">anchura</font>: el ancho de las celdas de la rejilla.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comentarios:</td>
+<td valign="top" width="77%" height=17>
+El par&aacute;metro <font face="Courier New" color="#0000ff">anchura</font> debe ser mayor que 1.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Por ejemplo, para definir una rejilla como &eacute;sta:<br>
+<br>
+<center><img src="images/rejilla.gif"><br>
+<font size=2>Fig. 1: la rejilla.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;debes usar <font face="Courier New" color="#0000ff">ism_establecer_rejilla(8,8,16);</font> Si no entiendes porqu&eacute; el ancho de la rejilla es 16 en este ejemplo, &eacute;chale un vistazo a la siguiente ampliaci&oacute;n de una de las losetas:<br>
+<br>
+<center><img src="images/loseta.gif"><br>
+<font size=2>Fif. 2: loseta.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Importante: definir la rejilla es lo primero que debes hacer al usar Isomot; cualquier otra de sus funciones a la que llames antes de definirla devolver&aacute; un error.</b><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ten en cuenta que, cada vez que defines la rejilla, se borran todos los elementos (objetos, etc.) de la vista isom&eacute;trica, as&iacute; que usa esta funci&oacute;n con cuidado si la usas varias veces, en lugar de una sola al principio del programa (por ejemplo, para redimensionarla).<br>
+<br><a name="f09"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Al llamar a la funci&oacute;n <font face="Courier New" color="#0000ff">ism_establecer_rejilla</font> se reserva una cierta cantidad de memoria para uso interno del motor. As&iacute; pues, cuando quieras liberar esta memoria (normalmente en el c&oacute;digo de finalizaci&oacute;n de tu programa), deber&aacute;s llamar a la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_destruir_todo(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Libera la memoria reservada por Isomot para su uso interno.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+Ninguno.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comentarios:</td>
+<td valign="top" width="77%" height=17>
+Si despu&eacute;s de llamar a esta funci&oacute;n quieres volver a usar Isomot, tendr&aacute;s que volver a llamar a <font face="Courier New" color="#0000ff">ism_establecer_rejilla</font> para que se vuelva a definir la rejilla y se vuelva a reservar la memoria necesaria.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+
+<br>
+<br>
+<font size=4>- <a name="par"></a>Paredes y losetas</font><br>
+<br>
+<center><img src="images/hohe.gif"><br>
+<font size=2>Fig. 3: Head Over Heels.</font></center>
+<br><a name="f07"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En la im&aacute;gen anterior, extraida del "Head Over Heels", se pueden ver claramente algunos de los m&aacute;s comunes elementos de las pantallas de cualquier juego isom&eacute;trico: los diferentes tipos de paredes, y las losetas. Isomot dibuja las paredes como un mos&aacute;ico de im&aacute;genes alineadas con el suelo. Para establecer estas im&aacute;genes y las del propio suelo, debes usar las siguientes funciones:<br><br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_colocar_pared(BITMAP *mapa, unsigned char eje, int pared);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Asigna un mapa a una o varias de las partes (alineadas con las losetas del suelo) en que se divide una pared.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3>
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa de la pared.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">eje</font>: el eje correspondiente a la pared. Los valores posibles son <font face="Courier New" color="#0000ff">SUP_X</font>, <font face="Courier New" color="#0000ff">INF_X</font>, <font face="Courier New" color="#0000ff">SUP_Y</font> e <font face="Courier New" color="#0000ff">INF_Y</font>.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">pared</font>: el n&uacute;mero de la pared. Puedes usar <font face="Courier New" color="#0000ff">TODAS</font> para establecer todas las paredes del eje indicado.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f04"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_colocar_loseta(BITMAP *mapa, int x, int y);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Asigna un mapa a una o varias losetas del suelo.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa de la loseta.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: las coordenadas de la loseta en la rejilla. Puedes usar <font face="Courier New" color="#0000ff">TODAS</font> en una de las coordenadas para establecer toda la fila de losetas. Tambi&eacute;n la puedes usar en ambas coordenadas para establecer todas las losetas a la vez.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f27"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_colocar_suelo(BITMAP *mapa);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Asigna un mapa para ser utilizado al dibujar el suelo, aparte de las losetas individuales que hayas podido definir con <a href="#f04">ism_colocar_loseta</a>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa a dibujar como suelo de la habitaci&oacute;n.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f17"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adem&aacute;s, puedes mover las paredes, el suelo y sus losetas con las siguientes funciones:<br><br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_mover_pared(unsigned char eje, int pared,int despeje, int despaltura);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Mueve una o varias paredes.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=4>
+Par&aacute;metros:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">eje</font>: el eje correspondiente a la pared. Los valores posibles son <font face="Courier New" color="#0000ff">SUP_X</font>, <font face="Courier New" color="#0000ff">INF_X</font>, <font face="Courier New" color="#0000ff">SUP_Y</font> e <font face="Courier New" color="#0000ff">INF_Y</font>.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">pared</font>: el n&uacute;mero de la pared. Puedes usar <font face="Courier New" color="#0000ff">TODAS</font> para mover todas las paredes del eje indicado.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">despeje, despaltura</font>: desplazamiento de la pared en el sentido del eje indicado y en la altura, respectivamente.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f15"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_mover_loseta(int x, int y, int despx, int despy);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Mueve una o varias losetas.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3>
+Par&aacute;metros:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: las coordenadas de la loseta en la rejilla. Puedes usar <font face="Courier New" color="#0000ff">TODAS</font> en una de las coordenadas para mover toda la fila de losetas. Tambi&eacute;n la puedes usar en ambas coordenadas para mover todas las losetas a la vez.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">despx, despy</font>: desplazamiento de la loseta en los ejes x e y, respectivamente.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f28"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_mover_suelo(int despx, int despy);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Mueve el suelo.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">despx, despy</font>: desplazamiento del suelo en los ejes x e y, respectivamente.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<br>
+<font size=4>- <a name="obj"></a>Objetos</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Objetos son todos los elementos que van a ser dibujados dentro de la habitaci&oacute;n, como bloques de piedra, enemigos, etc. Todo objeto colocado en la habitaci&oacute;n est&aacute; identificado por un valor del tipo de datos <font face="Courier New" color="#0000ff">ism_id</font>. Hay dos tipos de objetos: objetos de rejilla y objetos libres. Los objetos de rejilla son aquellos que est&aacute;n colocados en una posici&oacute;n concreta de la rejilla, y tienen las mismas anchuras que sus celdas. Los objetos rejilla son, b&aacute;sicamente, los bloques t&iacute;picos del juego sobre los que el jugador va a saltar, etc. No se puede cambiar las coordenadas x e y de un objeto rejilla, solo se puede cambiar su z. Por el contrario, objetos libres son aquellos que pueden estar en cualquier lugar y moverse libremente por la habitaci&oacute;n, como, por ejemplo, los enemigos, o el propio jugador, o todo aquello que deba tener anchuras distintas de las de las celdas de la rejilla. Para aclarar esto un poco, puedes ver la siguiente imagen:<br>
+<br>
+<center><img src="images/knightlr.gif"><br>
+<font size=2>Fig. 4: Knight Lore.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En esta habitaci&oacute;n del "Knight Lore" de Ultimate (por cierto, el primer juego que us&oacute; la t&eacute;cnica Filmation), todas las trampas de pinchos son objetos rejilla, fijos a una rejilla de 8x8 que se ha dibujado encima de la im&aacute;gen, pero Sabreman (el personaje del sombrero) y el guardi&aacute;n (el del casco) pueden moverse por la habitaci&oacute;n con bastante libertad, por lo que son objetos libres.<br>
+<br><a name="f06"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para colocar un objeto rejilla en la habitaci&oacute;n, la funci&oacute;n a utilizar es:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">ism_id ism_colocar_objeto_rejilla(int x, int y, int z, int altura, BITMAP *mapa, BITMAP *sombra);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Coloca un objeto rejilla en la vista isom&eacute;trica.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=6>
+Par&aacute;metros:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: las coordenadas de la rejilla en las que colocar el objeto.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">z</font>: la coordenada z del objeto, referida a su base. Puedes usar <font face="Courier New" color="#0000ff">ENCIMA</font> para ponerlo sobre el objeto (de culquier tipo) colocado a m&aacute;s altura en esa posici&oacute;n, es decir, colmo si se hubiera dejado caer desde el cielo. Esto es &uacute;til para formar columnas de objetos unos encima de otros sin tener que calcular la coordenada z de cada uno.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">altura</font>: la altura del objeto.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa del objeto. Si colocas este par&aacute;metro a <font face="Courier New" color="#0000ff">NULL</font>, el objeto no se dibujar&aacute;, pero a todos los efectos (colisiones, etc.) seguir&aacute; existiendo.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">sombra</font>: la sombra del objeto. Si colocas este par&aacute;metro a <font face="Courier New" color="#0000ff">NULL</font>, el objeto no tendr&aacute; sombra.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+El <font face="Courier New" color="#0000ff">identificador</font> del objeto si funcion&oacute;, <font face="Courier New" color="#0000ff">ID_ERROR</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f05"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para colocar un objeto libre en la habitaci&oacute;n:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">ism_id ism_colocar_objeto_libre(int x, int y, int z, int anchurax, int anchuray, int altura, BITMAP *mapa, BITMAP *sombra);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Coloca un objeto libre en la vista isom&eacute;trica.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=6>
+Par&aacute;metros:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y, z</font>: las coordenadas x, y y z del objeto, referidas al punto m&aacute;s a la izquierda de su base. Puedes usar <font face="Courier New" color="#0000ff">ENCIMA</font> el el par&aacute;metro <font face="Courier New" color="#0000ff">z</font> para ponerlo sobre el objeto (de culquier tipo) colocado a m&aacute;s altura en esa posici&oacute;n, es decir, colmo si se hubiera dejado caer desde el cielo. Esto es útil para formar columnas de objetos unos encima de otros sin tener que calcular la coordenada z de cada uno.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">anchurax, anchuray</font>: la anchura del objeto en las dimensiones X e Y.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">altura</font>: la altura del objeto.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa del objeto. Si colocas este par&aacute;metro a <font face="Courier New" color="#0000ff">NULL</font>, el objeto no se dibujar&aacute;, pero a todos los efectos (colisiones, etc.) seguir&aacute; existiendo.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">sombra</font>: la sombra del objeto. Si colocas este par&aacute;metro a <font face="Courier New" color="#0000ff">NULL</font>, el objeto no tendr&aacute; sombra.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+El <font face="Courier New" color="#0000ff">identificador</font> del objeto si funcion&oacute;, <font face="Courier New" color="#0000ff">ID_ERROR</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f21"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para obtener un dato concreto acerca de un objeto:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_obtener_dato_objeto(ism_id id, unsigned char dato);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Devuelve el dato solicitado acerca del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">dato</font>: el dato que se quiere obtener acerca del objeto. Los valores posibles son: <font face="Courier New" color="#0000ff">D_X</font> (la coordenada x), <font face="Courier New" color="#0000ff">D_Y</font> (la coordenada y), <font face="Courier New" color="#0000ff">D_Z</font> (la coordenada z), <font face="Courier New" color="#0000ff">D_ALTURA</font> (altura), <font face="Courier New" color="#0000ff">D_ANCHURA_X</font> (anchura en la dimensi&oacute;n x), <font face="Courier New" color="#0000ff">D_ANCHURA_Y</font> (anchura en la dimensi&oacute;n y) y <font face="Courier New" color="#0000ff">D_TRANSP</font> (porcentaje de transparencia del objeto)</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comentarios:</td>
+<td valign="top" width="77%" height=17>
+Si se solicita la coordenada x o la y de un objeto rejilla, la funci&oacute;n devuelve la coordenada de la celda de la rejilla en la que se encuentra.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+El dato solicitado si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table></br>
+<a name="f20"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hay una manera m&aacute;s f&aacute;cil de obtener las coordenadas de un objeto que hacer tres llamadas sucesivas a la funci&oacute;n anterior:<br>
+</br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_obtener_coords_objeto(ism_id id, int *dstx, int *dsty, int *dstz);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Almacena las coordenadas del objeto en las variables indicadas.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">dstx, dsty, dstz</font>: punteros a las variables donde se quiere que la funci&oacute;n almacene las coordenadas del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comentarios:</td>
+<td valign="top" width="77%" height=17>
+Si el objeto es de tipo rejilla, los valores almacenado en <font face="Courier New" color="#0000ff">dstx</font> y <font face="Courier New" color="#0000ff">dsty</font> ser&aacute;n los de la celda correspondiente de la rejilla.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f01"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para modificar una caracter&iacute;stica concreta de un objeto, usa la funci&oacute;n:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_cambiar_dato_objeto(ism_id id, unsigned char dato, int valor, unsigned char modo);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Modifica el dato solicitado del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=4 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">dato</font>: el dato que quieres modificar. Los valores posibles son: <font face="Courier New" color="#0000ff">D_X</font> (la coordenada x), <font face="Courier New" color="#0000ff">D_Y</font> (la coordenada y), <font face="Courier New" color="#0000ff">D_Z</font> (la coordenada z), <font face="Courier New" color="#0000ff">D_ALTURA</font> (altura), <font face="Courier New" color="#0000ff">D_ANCHURA_X</font> (anchura en la dimensi&oacute;n X), <font face="Courier New" color="#0000ff">D_ANCHURA_Y</font> (anchura en la dimensi&oacute;n Y) y <font face="Courier New" color="#0000ff">D_TRANSP</font> (porcentaje de transparencia del objeto)</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">valor</font>: el nuevo valor del dato.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">modo</font>: el modo en el que quieres cambiar el dato. Puedes usar <font face="Courier New" color="#0000ff">CAMBIAR</font> para sustituir el dato antiguo por el nuevo, o <font face="Courier New" color="#0000ff">SUMAR</font> para sumarlo.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comentarios:</td>
+<td valign="top" width="77%" height=17>
+Ocurrir&aacute; un error si tratas de cambiar la coordenada X o Y de un objeto rejilla, alguna de sus anchuras, o su porcentaje de transparencia.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f16"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y para cambiar r&aacute;pida y f&aacute;cilmente las coordenadas de un objeto libre, solo tienes que usar:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_mover_objeto(ism_id id, int x, int y, int z, unsigned char modo);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Modifica las coordenadas del objeto indicado.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3>
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y, z</font>: las nuevas coordenadas a las que hay que mover el objeto.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">modo</font>: el modo en que se quiere interpretar las nuevas coordenadas. Puedes usar <font face="Courier New" color="#0000ff">CAMBIAR</font> para cambiar las coordenadas del objeto por las x, y y z indicadas en la funci&oacute;n, o <font face="Courier New" color="#0000ff">SUMAR</font> para sumarlas.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Comentarios:</td>
+<td valign="top" width="77%">
+Ocurrir&aacute; un error si tratas de mover un objeto rejilla con esta funci&oacute;n.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f02"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para cambiar el mapa de un objeto:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_cambiar_mapa_objeto(ism_id id, BITMAP *mapa);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Cambia la im&aacute;gen del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">mapa</font>: el mapa con la nueva im&aacute;gen del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f03"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para cambiar la sombra de un objeto:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_cambiar_sombra_objeto(ism_id id, BITMAP *sombra);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Cambia la sombra de un objeto.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Par&aacute;metros:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">sombra</font>: el mapa con la nueva sombra del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f22"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;La funci&oacute;n para eliminar un objeto es:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_quitar_objeto(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Borra el objeto indicado de la vista isom&eacute;trica.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f13"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para saber si un objeto determinado existe:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_existe_objeto(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Indica si el existe el objeto con el identificador indicado.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">1</font> si el objeto existe, <font face="Courier New" color="#0000ff">0</font> en otro caso.</td>
+</tr>
+</table>
+<br>
+<a name="f23"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finalmente, para quitar todos los objetos, paredes y losetas:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_vaciar_mundo_isom(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Vac&iacute;a por completo la vista isom&eacute;trica.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+Ninguno.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<br>
+
+<font size=4>- <a name="col"></a>Detecci&oacute;n de colisiones</font>
+<br><br><a name="f14"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si, al intentar mover un objeto, este choca con otro, con alguna pared o con el suelo, la funci&oacute;n utilizada para ello devolver&aacute; un error, y el movimiento no se llevar&aacute; a cabo. Adem&aacute;s de esto, los identificadores de todos los objetos paredes, etc. con que haya chocado se almacenan en una pila interna del motor. Para consultar esta pila y comprobar con qu&eacute; elementos ha colisionado el objeto al intentar moverlo, puedes usar llamadas sucesivas a la siguiente funci&oacute;n:<br><br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_extraer_id_blq(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Extr&aacute;e un identificador de la pila de colisiones.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+Ninguno.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">NO_ID</font> si no ha chocado con nada, o si ya se han extraido todos los identificadores de la pila de colisiones en llamadas anteriores a esta funci&oacute;n, el identificador de un objeto con el que el objeto que se ha intentado mover haya chocado, o <font face="Courier New" color="#0000ff">ID_PARED_SUP_X</font>, <font face="Courier New" color="#0000ff">ID_PARED_SUP_Y</font>, <font face="Courier New" color="#0000ff">ID_PARED_INF_X</font>, <font face="Courier New" color="#0000ff">ID_PARED_INF_Y</font> o <font face="Courier New" color="#0000ff">ID_SUELO</font> si ha chocado con alguna pared o con el suelo.</td>
+</tr>
+</table>
+<br>
+<a name="f24"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si quieres saber si el &uacute;ltimo objeto movido ha colisionado con un determinado objeto, pared o con el suelo:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_colisionado_con(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Comprueba si el &uacute;ltimo objeto movido ha colisionado con el suelo, pared u objeto indicado.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: el identificador del objeto con el que se quiere saber si se ha chocado, o <font face="Courier New" color="#0000ff">ID_PARED_SUP_X</font>, <font face="Courier New" color="#0000ff">ID_PARED_SUP_Y</font>, <font face="Courier New" color="#0000ff">ID_PARED_INF_X</font>, <font face="Courier New" color="#0000ff">ID_PARED_INF_Y</font> o <font face="Courier New" color="#0000ff">ID_SUELO</font> si se quiere saber si se ha chocado con alguna pared o con el suelo.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">1</font> si se ha chocado con el objeto, suelo o pared indicada, <font face="Courier New" color="#0000ff">0</font> en otro caso.</td>
+</tr>
+</table>
+<br>
+<a name="f25"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si quieres saber con cuantos objetos ha chocado el &uacute;ltimo objeto movido, incluyendo paredes y suelo:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_num_colisiones(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Devuelve el n&uacute;mero de objetos, paredes y suelo con los que ha colisionado el &uacute;ltimo objeto movido.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+Ninguno.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Devuelve:</td>
+<td valign="top" width="77%" height=17>
+El n&uacute;mero de objetos, paredes y suelo con los que ha colisionado el &uacute;ltimo objeto movido.</td>
+</tr>
+</table>
+<br><br>
+<a name="f19"></a>
+<font size=4>- <a name="coorej"></a>Coordenadas de la rejilla</font>
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Al usar las funciones del motor para averiguar las coordenadas de un objeto rejilla, lo que obtenemos para la x y la y no son sus coordenadas reales basadas en los ejes de referencia, lo que llamaremos "coordenadas libres", sino las referidas a su situaci&oacute;n dentro de la rejilla, que llamaremos "coordenadas de rejilla". Normalmente, con esto debe ser m&aacute;s que suficiente para nuestros prop&oacute;sitos, pero puede haber ocasiones en que nos interese transformar coordenadas de un formato a otro, para comparar las posiciones de un objeto rejilla y otro libre, o para calcular su distancia, por ejemplo. Para ello, disponemos de las siguintes dos funciones:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_obtener_coords_libres(int x, int y, int *xl, int *yl);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Obtiene las coordenadas x e y, respecto de los ejes de coordenadas, del punto situado m&aacute;s a la izquierda de una celda dada de la rejilla.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: coordenadas de rejilla de la celda.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xl, yl</font>: punteros a las variables donde se quiere almacenar las x e y libres.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f18"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_obtener_coords_celda(int x, int y, int *xc, int *yc);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Obtiene las coordenadas de rejilla de la celda del suelo sobre la que se encuentra un punto determinado.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: coordenadas x e y libres del punto dado.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xc, yc</font>: punteros a las variables donde se quiere almacenar las x e y de rejilla.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><br>
+
+
+
+
+<a name="f32"></a>
+<font size=4>- <a name="convc"></a>Convirtiendo coordenadas entre 2d y 3d</font>
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cuando uses Isomot, por lo general manejar&aacute;s dos tipos de coordenadas; las 2d referidas a las im&aacute;genes, y las 3d de tu mundo isom&eacute;trico. Algunas veces, te puede resultar &uacute;til transformar coordenadas de un tipo en otro (por ejemplo, para usar el rat&oacute;n). Para ello, puedes utilizar las dos funciones siguientes:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_coords_iso_a_2d(int xiso, int yiso, int ziso, int *x2d, int *y2d);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%"> Transforma coordenadas isom&eacute;tricas 3d en sus equivalentes 2d. Es decir, indica en que punto de la im&aacute;gen de destino se dibujar&aacute; un punto isom&eacute;trico determinado.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xiso, yiso, ziso</font>: las coordenadas isom&eacute;tricas que quieres transformar en 2d.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x2d, y2d</font>: punteros a las variables donde quieres que se almacenen los valores x e y 2d.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Comentarios:</td>
+<td valign="top" width="77%">
+Las coordenadas 2d devueltas se refieren al mapa donde est&eacute;s dibujando el mundo isom&eacute;trico y al lugar del mismo en el que est&eacute; dibujando el origen de coordenadas isom&eacute;trico, es decir, los valores de tu &uacute;ltima llamada a <a href="#f10">ism_dibujar_mundo_isom(BITMAP *mapa_destino, int x0, int y0);</a>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><a name="f31"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_coords_2d_a_iso(int *xiso, int *yiso, int *ziso, int x2d, int y2d, int vfija, unsigned char cfija);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Transforma coordenadas 2d en sus equivalentes 3d. Es decir, indica cu&aacute;l es el punto isom&eacute;trico alineado con un punto 2d del mapa en el que dibujas el mundo isom&eacute;trico, y que pertenece a un plano determinado.</td>
+</tr>
+
+<tr>
+<td valign="top" width="23%" rowspan=3 height=8>Par&aacute;metros:</td>
+
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xiso, yiso, ziso</font>: punteros a las variables donde quieres almacenar las coordenadas isom&eacute;tricas.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x2d, y2d</font>: la x e y del punto 2d.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">vfija, cfija</font>: el plano que contiene el punto isom&eacute;trico. Debe ser paralelo al plano x, y o z, por lo que <font face="Courier New" color="#0000ff">cfija</font> debe valer <font face="Courier New" color="#0000ff">D_X, D_Y o D_Z</font>, y <font face="Courier New" color="#0000ff">vfija</font> será la coordenada de dicho plano.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Comentarios:</td>
+<td valign="top" width="77%">
+Date cuenta de que un punto 2d no se corresponde con un &uacute;nico punto isom&eacute;trico, sino con toda una recta perpendicular a la imagen. Por ello, para obtener un &uacute;nico punto, hay que intersectar esta recta con un plano, que es el que debes indicar a la funci&oacute;n con sus dos &uacute;ltimos par&aacute;metros. Por ejemplo, para hallar el punto isom&eacute;trico del suelo correspondiente a tu punto 2d, <font face="Courier New" color="#0000ff">vfija</font> debe valer 0, y <font face="Courier New" color="#0000ff">cfija D_Z</font>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font>  si funcion&oacute, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+
+
+
+
+
+<br><br><a name="#f12"></a>
+<font size=4>- <a name="somb"></a>Sombras</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Al colocar nuevos objetos, podemos indicar la forma de la sombra que estos objetos proyectan sobre los otros objetos situados justo debajo y sobre el suelo, mediante el uso del par&aacute;metro <font face="Courier New" color="#0000ff">sombra</font>. Este par&aacute;metro es un mapa de bits que debe contener una m&aacute;scara que indique la forma de dicha sombra. La intensidad con que las sombras son dibujadas es, por defecto, de un 50%, pero este porcentaje se puede cambiar mediante la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_establecer_sombras(char sombras);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Establece el porcentaje de sombreado entre un 0% (sin sombras) y un 100% (sombras totalmente negras).</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">sombras</font>: porcentaje de sombreado a aplicar.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><br>
+<font size=4>- <a name="transp"></a>Objetos transparentes</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Otra de las posibilidades de los objetos libres, es la de que tengan un determinado nivel de transparencia. Todos los objetos libres tienen por defecto un 0% de transparencia cuando son creados, pero puedes variar este porcentaje entre 0 (opaco) y 100 (totalmente invisible) con la funci&oacute;n <font face="Courier New" color="#0000ff">ism_cambiar_dato_objeto</font>, indicando <font face="Courier New" color="#0000ff">D_TRANSP</font> como dato a modificar. Tambi&eacute;n puedes consultar el porcentaje de transparencia de un objeto mediante la funci&oacute;n <font face="Courier New" color="#0000ff">ism_obtener_dato_objeto</font>,indicando <font face="Courier New" color="#0000ff">D_TRANSP</font> como dato a consultar. Como detalle extra, y para aumentar el realismo, las sombras de los objetos transparentes se dibujan m&aacute;s tenues, en un grado que depende de cu&aacute;n transparente s&eacute;a el objeto.<br><br>
+<a name="#f26"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Para dibujar los objetos transparentes, Isomot utiliza las funciones est&aacute;ndar de Allegro. Como todos sabemos, estas no son especialmente r&aacute;pidas, as&iacute; que si quieres que Isomot use tus propias funciones, o las de alguna otra librer&iacute;a, como FBlend por ejemplo (recomiendo &eacute;sta especialmente, busca en <a href="www.allegro.cc">www.allegro.cc</a> para m&aacute;s informaci&oacute;n al respecto), se lo puedes indicar a Isomot mediante la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_func_transp(void(*f_transp)(BITMAP *, BITMAP *, int, int, int));</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Establece la funci&oacute;n que Isomot utilizar&aacute; para dibujar los objetos transparentes.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">f_transp</font>: la funci&oacute;n de transparencia a utilizar.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Comentarios:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">f_transp</font> debe ser una funci&oacute;n que devuelva void, y tome los siguientes par&aacute;metros: (BITMAP *org, BITMAP *dst, int x, int y, int fact), donde org y dst son el mapa origen y destino (es decir, que org es el mapa que se va a dibujar en dst), x e y son las coordenadas de dst donde se va a dibujar org, y fact es el factor de transparencia a aplicar, que puede tomar valores entre 0 (valor que corresponde a un 100% de transparencia) y 255 (que corresponde a un 0% de transparencia) Esto coincide exactamente con la declaraci&oacute;n de la funci&oacute;n <font face="Courier New" color="#0000ff">fblend_trans</font> de la librería FBlend, lo que no es ninguna casualidad ;). De este modo, si usas FBlend en tu proyecto, bastar&aacute; con ejecutar la instrucci&oacute;n <font face="Courier New" color="#0000ff">ism_func_transp(fblend_trans);</font> para que Isomot la utilice para dibujar los objetos transparentes, en logar de las funciones propias de Allegro.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br><br>
+<font size=4>- <a name="dib"></a>Dibujando la vista isom&eacute;trica</font><br>
+
+
+
+<br><a name="f10"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;De acuerdo. Hemos definido la rejilla, hemos asignado mapas a las paredes y las losetas, y hemos insertado unos cuantos objetos. &iquest;Como hacemos ahora para ver el resultado de todo esto? F&aacute;cil. Tan solo tienes que llamar a la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_dibujar_mundo_isom(BITMAP *mapa_destino, int x0, int y0);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Dibuja la vista isom&eacute;trica en un mapa dado.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">mapa_destino</font>: el mapa donde quieres que se dibuje la vista isom&eacute;trica.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x0, y0</font>: el punto de <font face="Courier New" color="#0000ff">mapa_destino</font> donde quieres que se dibuje el punto (0,0,0) de la vista.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table><br>
+<a name="f29"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adem&aacute;s de esto, Isomot te da la posibilidad de dibujar las habitaciones oscureci&eacute;ndolas en un determinado porcentaje, para simular la noche, el apagado de una luz, o lo que quieras. Dicho porcentaje de oscurecimiento se le indica a Isomot mediante la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_establecer_oscuridad(char oscuridad);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Indica el porcentaje de oscurecimiento que Isomot debe aplicar al dibujar el mundo isométrico mediante la funci&oacute;n <a href="#dib">ism_dibujar_mundo_isom</a>.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">oscuridad</font>: porcentaje de oscurecimiento de 0 (no oscurecer) a 100 (completamente negro).</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> si funcion&oacute;, <font face="Courier New" color="#0000ff">-1</font> si fall&oacute;.</td>
+</tr>
+</table>
+<br>
+<a name="f30"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hay que tener en cuenta que Isomot utiliza una optimizaci&oacute;n especial, llamada "rect&aacute;ngulos sucios", de modo que en cada llamada a <a href="#dib">ism_dibujar_mundo_isom</a> &uacute;nicamente se dibujan aquellas partes del mundo que han cambiado. Esto puede acelerar enormemente el funcionamiento del motor, pero tambi&eacute;n puede ocasionar algunos problemas si haces cosas raras, como dibujar el mundo isom&eacute;trico en diferentes mapas de destino, o si borras el mapa de destino antes de cada llamada a <a href="#dib">ism_dibujar_mundo_isom</a>. Si se da el caso, puedes evitar esto desactivando los rect&aacute;ngulos sucios usando para ello la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">void ism_habilitar_rect_sucio(char habilitar);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+activa o desactiva la utilización de rect&aacute;ngulos sucios.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">habilitar</font>: indica si hay que habilitar (valor 1) o deshabilitar (valor 0) los rect&aacute;ngulos sucios (por defecto siempre est&aacute;n habilitados).</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+Nada.</td>
+</tr>
+</table>
+<br>
+<br>
+<a name="f08"></a>
+- <font size=4><a name="err"></a>Errores</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si una funci&oacute;n devuelve un error, probablemente quieras saber qu&eacute; fu&eacute; mal. Puedes obtener una descripci&oacute;n del error llamando a la siguiente funci&oacute;n:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">char *ism_desc_error(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Descripci&oacute;n:</td>
+<td valign="top" width="77%">
+Devuelve un puntero a una cadena de texto con la explicaci&oacute;n del error (en espa&ntilde;ol).</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Par&aacute;metros:</td>
+<td valign="top" width="77%" height=8>
+Ninguno</td>
+</tr>
+<tr><td valign="top" width="23%">
+Devuelve:</td>
+<td valign="top" width="77%">
+Una cadena con la explicaci&oacute;n del error.</td>
+</tr>
+</table><br>
+<br>
+
+- <font size=4><a name="lng"></a>El fichero ism_lng.h</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Como ya se ha mencionado antes, Isomot consta de un interface biling&uuml;e ingl&eacute;s - espa&ntilde;ol. Por defecto, puedes utilizar las funciones de ambos interfaces sin problemas, pero lo m&aacute;s l&oacute;gico, ya que est&aacute;s leyendo la versi&oacute;n espa&ntilde;ola de la documentaci&oacute;n, es que s&oacute;lo tengas inter&eacute;s en usar las funciones en espa&ntilde;ol. Si es as&iacute;, puedes evitar que se compile el interface ingl&eacute;s, con la consiguiende reducci&oacute;n del tama&ntilde;o del ejecutable generado y la consiguiente mejora de rendimiento, editando el fichero ism_lng, y eliminando la definici&oacute;n de ISM_ENG. Cierto que ninguna de las dos mejoras ser&aacute; espectacular, pero toda peque&ntilde;a ayuda es siempre bienvenida.<br>
+<br><br>
+
+- <font size=4><a name="glos"></a>Resumen de funciones</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lo que sigue es una lista, ordenada alfabeticamente, de todas las funciones del interface en espa&ntilde;ol de isomot. Pincha en ellas para ver la descripci&oacute;n detallada de cada una.<br><br>
+<a href="#f01">ism_cambiar_dato_objeto(ism_id id, unsigned char dato, int valor, unsigned char modo);</a><br>
+<a href="#f02">ism_cambiar_mapa_objeto(ism_id id, BITMAP *mapa);</a><br>
+<a href="#f03">ism_cambiar_sombra_objeto(ism_id id, BITMAP *sombra);</a><br>
+<a href="#f24">ism_colisionado_con(ism_id id);</a><br>
+<a href="#f04">ism_colocar_loseta(BITMAP *mapa, int x, int y);</a><br>
+<a href="#f05">ism_colocar_objeto_libre(int x, int y, int z, int anchurax, int anchuray, int altura, BITMAP *mapa, BITMAP *sombra);</a><br>
+<a href="#f06">ism_colocar_objeto_rejilla(int x, int y, int z, int altura, BITMAP *mapa, BITMAP *sombra);</a><br>
+<a href="#f07">ism_colocar_pared(BITMAP *mapa, unsigned char eje, int pared);</a><br>
+<a href="#f27">ism_colocar_suelo(BITMAP *mapa);</a><br>
+<a href="#f32">ism_coords_2d_a_iso(int *xiso, int *yiso, int *ziso, int x2d, int y2d, int vfija, unsigned char cfija);</a><br>
+<a href="#f31">ism_coords_iso_a_2d</a><br>
+<a href="#f08">ism_desc_error(void);</a><br>
+<a href="#f09">ism_destruir_todo(void);</a><br>
+<a href="#f10">ism_dibujar_mundo_isom(BITMAP *mapa_destino, int x0, int y0);</a><br>
+<a href="#f11">ism_establecer_rejilla(int x, int y, int anchura);</a><br>
+<a href="#f29">ism_establecer_oscuridad(char oscuridad);</a><br>
+<a href="#f12">ism_establecer_sombras(char sombras);</a><br>
+<a href="#f13">ism_existe_objeto(ism_id id);</a><br>
+<a href="#f14">ism_extraer_id_blq(void);</a><br>
+<a href="#f26">ism_func_transp(void(*f_transp)(BITMAP *, BITMAP *, int, int, int));</a><br>
+<a href="#f30">ism_habilitar_rect_sucio(char habilitar);</a><br>
+<a href="#f15">ism_mover_loseta(int x, int y, int despx, int despy);</a><br>
+<a href="#f16">ism_mover_objeto(ism_id id, int x, int y, int z, unsigned char modo);</a><br>
+<a href="#f17">ism_mover_pared(unsigned char eje, int pared, int despeje, int despaltura);</a><br>
+<a href="#f28">ism_mover_suelo(int despx, int despy);</a><br>
+<a href="#f25">ism_num_colisiones(void);</a><br>
+<a href="#f18">ism_obtener_coords_celda(int x, int y, int *xc, int *yc);</a><br>
+<a href="#f19">ism_obtener_coords_libres(int x, int y, int *xl, int *yl);</a><br>
+<a href="#f20">ism_obtener_coords_objeto(ism_id id, int *dstx, int *dsty, int *dstz);</a><br>
+<a href="#f21">ism_obtener_dato_objeto(ism_id id, unsigned char dato);</a><br>
+<a href="#f22">ism_quitar_objeto(ism_id id);</a><br>
+<a href="#f23">ism_vaciar_mundo_isom(void);</a><br>
+<br><br>
+
+- <font size=4><a name="cons"></a>Consejos</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;El primero de todos, procura mantener la rejilla lo m&aacute;s peque&ntilde;a posible, as&iacute; como el n&uacute;mero m&aacute;s reducido posible de objetos. De este modo el motor usar&aacute; menos memoria y funcionar&aacute; m&aacute;s r&aacute;pido (obvio, &iquest;verdad?).<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Se pueden hacer bastantes menos cosas con los objetos rejilla que con los libres, pero no hay nada que puedas hacer con un rejilla que no puedas hacer con un libre, as&iacute; que probablemente sientas la tentaci&oacute;n de definir todos los objetos como libres y dejarte de historias. &iexcl;No lo hagas! Los objetos rejilla se manejan mucho m&aacute;s r&aacute;pido y ocupan mucha menos memoria que los libres.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si vas a trabajar con varios objetos sucesivamente, no empieces con uno hasta que no hayas terminado con el anterior. Por ejemplo:<br>
+<font face="Courier New" color="#0000ff">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x1=ism_obtener_dato_objeto(obj1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_cambiar_dato_objeto(obj1,x1+1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x2=ism_obtener_dato_objeto(obj2,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_cambiar_dato_objeto(obj2,x2+1,D_X);<br>
+</font>
+&nbsp;&nbsp;&nbsp;funcionar&aacute; mucho m&aacute;s r&aacute;pido que:<br>
+<font face="Courier New" color="#0000ff">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x1=ism_obtener_dato_objeto(obj1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x2=ism_obtener_dato_objeto(obj2,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_cambiar_dato_objeto(obj1,D_X,x1+1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_cambiar_dato_objeto(obj2,D_X,x2+1);<br>
+</font>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;El proceso que dibuja las sombras est&aacute; optimizado para ciertos porcentajes de sombreado con los que funcionará bastante m&aacute;s r&aacute;pido. Estos porcentajes son, para mapas de 24 y 32 bits de color, 50%, 75%, 87%, 93%, 97%, 98%, 99% y 100%, y para 15 y 16 bits, 47%, 48%, 49%, 50%, 72%, 73%, 74%, 75%, 85%, 86%, 87%, 91%, 92%, 93%, 97%, 98%, 99%, y 100%. Ya se que parece bastante raro, pero hay una raz&oacute;n l&oacute;gica para que s&eacute;an estos porcentajes los que se puedan optimizar, y no otros ;)<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Las posibilidades de la funci&oacute;n <font face="Courier New" color="#0000ff">ism_func_transp</font> van mucho m&aacute;s all&aacute; de la de hacer m&aacute;s r&aacute;pido el dibujado de los objetos transparentes; puedes escribir tu propia funci&oacute;n y jugar con el nivel de transparencia de los objetos para aplicarles efectos especiales, como oscurecerlos, dibujarlos en blanco y negro, transparentar solo ciertas componentes del color, o cualquier otra cosa que se te ocurra.<br>
+<br><br>
+
+- <font size=4><a name="hist"></a>Historia</font><br>
+<br>
+* 18/05/2008 v1.0.<br>
+- A&ntilde;adidas las funciones <a href="#f31">ism_coords_iso_a_2d</a> and <a href="#f32">ism_coords_2d_a_iso</a>, para convertir entre coordenadas 2d de im&aacute;gen y 3d isom&eacute;tricas.<br>
+- Los rect&aacute;ngulos sucios est&aacute;n ahora desactivados por defecto. Si los quieres, tendr&aacute;s que activarlos llamando a <a href="#f30">ism_habilitar_rect_sucio</a>.<br>
+- Incrementada la compatibilidad con C++.<br>
+- Arreglados un par de fallos menores aqu&iacute; y all&aacute;.<br>
+<br>
+* 27/05/2005 vb0.5.<br>
+- A&ntilde;adidas las funciones <a href="#f27">ism_colocar_suelo</a>, para poder dibujar el suelo con una sola imágen, adem&aacute;s de como un mos&aacute;ico de losetas, e <a href="#f28">ism_mover_suelo</a>, para poder mover este nuevo suelo.<br>
+- A&ntilde;adida la funci&oacute;n <a href="#f29">ism_establecer_oscuridad</a>, para definir el porcentaje de oscurecimiento con el que se dibujar&aacute; la habitaci&oacute;n.<br>
+- A&ntilde;adida la optimizaci&oacute;n por rect&aacute;ngulos sucios, as&iacute; como la funci&oacute;n <a href="#f30">ism_habilitar_rect_sucio</a>, para desactivarlos si es necesario.<br>
+- Arreglados un par de fallos sin importancia.<br>
+<br>
+* 02/11/2004 vb0.4.<br>
+- Esta versi&oacute;n nunca lleg&oacute; a hacerse p&uacute;blica; tan solo ten&iacute;a un par de modificaciones sin importancia.<br>
+<br>
+* 01/08/2003 vb0.3.<br>
+- A&ntilde;adidas las funciones <a href="#f24">ism_colisionado_con</a> e <a href="#f25">ism_num_colisiones</a>, para facilitar el control de colisiones (gracias a Ron Ophir por darme la id&eacute;a).<br>
+- Soporte para objetos transparentes.<br>
+- Optimizado el proceso de dibujado de sombras.<br>
+<br>
+* 30/04/2003 vb0.2.<br>
+- Soporte para mapas con cualquier profundidad de color.<br>
+- A&ntilde;adido el fichero inm_lng.h para la optimización de los interfaces.<br>
+- Desde el principio, Isomot estaba pensado como un proyecto C, pero inadvertidamente lo estuve compilando siempre como C++, por lo que al querer compilarlo como C aparecieron bastantes errores que antes no se mostraban. Todos estos están ya arreglados (gracias a Neil Walker por ponerme sobre la pista de esto).<br>
+- Un par de peque&ntilde;as optimizaciones y alg&uacute;n error arreglado sin mayor importancia.<br>
+<br>
+* 22/03/2003 vb0.1<br>
+- Primera versi&oacute;n beta diatribuida.<br>
+<br><br>
+- <font size=4><a name="agr"></a>Agradecimientos</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Muchas personas me han ayudado en la realizaci&oacute;n de este proyecto, sobre todo mis colegas de Retrospec: a Tomaz Kac le debo el m&eacute;todo de sombreado por enmascaramiento, el logo de Isomot est&aacute; basado en una id&eacute;a de Dan Condon-Jones, Neil Walker me ha ayudado a optimizar y depurar el c&oacute;digo, y todos los dem&aacute;s, Arif Majothi, Bill Harbison, Graham Goring, Jeff Brayne, John Dow, Matthew Smith, Peter Jovanovic, Richard Jordan y Russ Hoy, me han ayudado mucho con sus comentarios y su apoyo. Tambi&eacute;n I&ntilde;aki Mart&iacute;nez y Ron Ophir han aportado sus valiosas sugerencias y cooperaci&oacute;n. Y tambi&eacute;n quiero dar las gracias a todas aquellas personas que me han escrito para interesarse por el proyecto y animarme a terminarlo. 
+<br><br>
+
+<hr width="100%">
+<center>&copy;2008 - Ignacio P&eacute;rez Gil.<br>Logo de Ignacio's SP Remakes por Ric Lumb.</center>
+
+</font>
+</body>
+</html>

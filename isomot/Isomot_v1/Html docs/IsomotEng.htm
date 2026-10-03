@@ -1,0 +1,1127 @@
+<html>
+<head>
+  <meta name="Author" content="Ignacio P&eacute;rez Gil">
+  <meta HTTP-EQUIV="Contents" content="Isomot">
+  <meta HTTP-EQUIV="Keywords" content="Isomot">
+  <title>Isomot v1.0</title>
+</head>
+<body bgcolor="#C0C0C0">
+<font face="Times New Roman,Times">
+
+
+<table width="100%">
+<tr>
+<td valign="center" width="20%">
+<center><a href="http://retrospec.sgn.net"><img src="images/retrspec.gif" nosave border=0></a></center>
+</td>
+<td valign="center" width="60%">
+<center><a href="http://retrospec.sgn.net/users/ignacio/index.html"><img src="images/l.gif" nosave border=0></a></center>
+</td>
+<td valign="center" width="20%">
+<center><a href="IsomotEsp.htm"><img src="images/vesp.gif" nosave border=0 height=32 width=32><br>
+Versi&oacute;n espa&ntilde;ola</a></center>
+</td>
+</tr>
+</table>
+<hr width="100%">
+<center><img src="images/isologo.gif" nosave border=0 height=182 width=168></center><br>
+<font size=4>
+Isomot v1.0 by Ignacio P&eacute;rez Gil (perezg_ret@terra.es)<br>
+<br>
+- <a href="#que">What's Isomot?</a><br>
+- <a href="#dist">Distribution notes</a><br>
+- <a href="#inst">How to set up Isomot on your Allegro project</a><br>
+- <a href="#rej">The grid</a><br>
+- <a href="#par">Walls and floor tiles</a><br>
+- <a href="#obj">Objects</a><br>
+- <a href="#col">Collision detection</a><br>
+- <a href="#coorej">Grid coordinates</a><br>
+- <a href="#convc">Converting between 2d and 3d coordinates</a><br>
+- <a href="#somb">Shadows</a><br>
+- <a href="#transp">Transparent objects</a><br>
+- <a href="#dib">Drawing the isometric view</a><br>
+- <a href="#err">Errors</a><br>
+- <a href="#lng">The ism_lng.h file</a><br>
+- <a href="#glos">Functions summary</a><br>
+- <a href="#cons">Programming tips</a><br>
+- <a href="#hist">History</a><br>
+- <a href="#agr">Acknowledgements</a><br>
+<br>
+<br>
+- <a name="que"></a>What's Isomot?</font><br>
+<br>
+<font>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Isomot is an isometric engine for Allegro, in the purest Filmation tradition (Do you remember Knight Lore, Alien 8, Sweevo's World, Head Over Hells, etc?) with an 1,1/2,1/2 prespective, where the x axis is the one going down-right, the y one going down-left and z going up. This doc is not intended to be an isometric tutorial, so I will assume that you know a little about this kind of prespective. Anyway, if you have any questions, you can e-mail me at <a href="mailto:perezg_ret@terra.es">perezg_ret@terra.es</a>. Isomot has a multilingual interface; Spanish and English are the languages actually supported (this doc is about the English interface). Adding new languages is very easy, if you want to make the interface for another one, just e-mail me and I'll tell you how.<br>
+<br>
+<br>
+<font size=4>- <a name="dist"></a>Distribution notes</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This source code is distributed "as is", without any warranty, and I will not accept any responsability for any kind of damage it can cause.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You are free to use it on your own programs, as is or with your own changes, <b>but only for non-commercial purpouses</b>. Anyway, a mention on the credits, and a short e-mail telling me about what you think about it, the changes you've made, etc. would be very nice of you :)<br>
+<br>
+<br>
+<font size=4>- <a name="inst"></a>How to set up Isomot on your Allegro project</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To use Isomot, you just have to add the file isomot.c to your project (and don't forget to #include "isomot.h" on the file or files where you are going to use it). Easy, isn't it?<br>
+<br>
+<br><a name="f21"></a>
+<font size=4>- <a name="rej"></a>The grid</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Every room's floor of a typical isometric game has a grid over wich nearly all objects are placed. To define this grid, you must use the following function:<br><br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_grid(int x, int y, int width);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Defines (or redefines) the grid.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: the grid's dimensions.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">width</font>: the width of the grid's cells.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Notes:</td>
+<td valign="top" width="77%" height=17>
+The <font face="Courier New" color="#0000ff">width</font> parameter must be grater than 1.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For example, to set a grid like this one:<br>
+<br>
+<center><img src="images/rejilla.gif"><br>
+<font size=2>Image 1: the grid.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;you must use <font face="Courier New" color="#0000ff">ism_set_grid(8,8,16);</font> If you can't understand why the indicated grid's width is 16, just look at this enlarged image of a floor tile:<br>
+<br>
+<center><img src="images/loseta.gif"><br>
+<font size=2>Image 2: floor tile.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Important note: defining the grid is the first thing you must do when using Isomot; any other function of it's interface called before <font face="Courier New" color="#0000ff">ism_set_grid</font> will return an error.</b><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Keep in mind that every time you set the grid, everything on it is erased, so, use it with care if you are doing it more than one time (for example, to resize it), not just once at the start of the program.<br>
+<br><a name="f04"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When calling <font face="Courier New" color="#0000ff">ism_set_grid</font>, a certain amount of memory is reserved for the engine's internal use. At the moment of releasing this memory (on your program ending code, usually), you should call the following function:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_destroy_all(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Frees all memory used by Isomot.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+None.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Comments:</td>
+<td valign="top" width="77%" height=17>
+If you want to use Isomot's capabilities again after calling this function, you must call <font face="Courier New" color="#0000ff">ism_set_grid</font> again.
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<br>
+
+<font size=4>- <a name="par"></a>Walls and floor tiles</font><br>
+<br>
+<center><img src="images/hohi.gif"><br>
+<font size=2>Image 3: Head Over Heels.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;On the previous image from "Head Over Heels", you can see a few of the most common elements of any room's scenery: the different kinds of walls and floor tiles. Isomot draws walls as a set of images, each one aligned with the floor tiles. To set all of them, you must use the following functions:<br><br>
+<a name="f23"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_wall(BITMAP *map, unsigned short axis, int wall);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets a bitmap to one or many of the parts of a wall.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3>
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the wall's bitmap.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">axis</font>: the axis of the wall or walls you are going to set. Possible values are <font face="Courier New" color="#0000ff">HIGH_X</font>, <font face="Courier New" color="#0000ff">LOW_X</font>, <font face="Courier New" color="#0000ff">HIGH_Y</font> and <font face="Courier New" color="#0000ff">LOW_Y</font>.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">wall</font>: the wall's number. You can use <font face="Courier New" color="#0000ff">ALL</font> to set all the walls of the axis.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f20"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_floor_tile(BITMAP *map, int x, int y);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets one or many floor tiles.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the floor tile's bitmap.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: the coordinates of the grid's cell wich floor tile you are setting. You can use <font face="Courier New" color="#0000ff">ALL</font> on one of them to set an entire row of floor tiles. You can use it too on both of them to set all floor tiles to the given bitmap.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f27"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_floor(BITMAP *map);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets a bitmap to be used when drawing the room's floor, appart from the floor tiles you can set with <a href="#f20">ism_set_floor_tiles</a>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the map to be used as room's floor.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f15"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;And you can move the floor, it's tiles and the walls with the following functions:<br><br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_move_wall(unsigned char axis, int wall, int offsetaxis, int offsetheight);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Moves one or many walls.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=4>
+Parameters:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">axis</font>: the wall's axis. Possible values are <font face="Courier New" color="#0000ff">HIGH_X</font>, <font face="Courier New" color="#0000ff">LOW_X</font>, <font face="Courier New" color="#0000ff">HIGH_Y</font> and <font face="Courier New" color="#0000ff">LOW_Y</font>.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">wall</font>: the wall's number. You can use <font face="Courier New" color="#0000ff">ALL</font> to move all the walls of the given axis.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">offsetaxis, offsetheight</font>: the offset ot the wall on the given axis and on height.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f13"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_move_floor_tile(int x, int y, int offsetx, int offsety);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Moves one or many floor tiles.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3>
+Parameters:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: the coordinates of the floor tile. You can use <font face="Courier New" color="#0000ff">ALL</font> on one of them to move a full row of tiles. You can use it on both of them too, to move all floor tiles.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">offsetx, offsety</font>: the floor tile offset on the x and y axis.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f28"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_move_floor(int offsetx, int offsety);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Moves the floor.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">offsetx, offsety</font>: the floor offset on the x and y axis.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+
+<br>
+<font size=4>- <a name="obj"></a>Objects</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Objects are everything that are drawn on the room, like stone blocks, enemies, etc. Every object you place on the room is identified by a value of the <font face="Courier New" color="#0000ff">ism_id</font> data type. There are two kinds of objects: grid and free objects. Grid objects are those that are placed on a certain square of the grid, and have the same widths as the floor tiles. Grid objects are basically the standard blocks of the game over wich the player will jump, etc. You can't move a grid object on their x or y coordinates; you can only change their z. On the other way, free objects are those objects that can be at any place, moving arround, for example, the player's character, enemies, or everything else able to be moved on the x or y axis and have different widths than the floor tiles ones. To get a clearer view of this, just take a look to the following picture:<br>
+<br>
+<center><img src="images/knightlr.gif"><br>
+<font size=2>Image 4: Knight Lore.</font></center>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;On this image, taken from Ultimate's Knight Lore (the first Filmation game), all obstacles are grig objects, fixed on an 8x8 grid, but Sabreman (the hat guy) and the guardian (the helmet one) can walk arround the room, so they are free objects.<br>
+<br><a name="f18"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To put a grid object on the room you must use the function:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">ism_id ism_put_grid_object(int x, int y, int z, int height, BITMAP *map, BITMAP *shadow);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Puts a grid object on the isometric view.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=6>
+Parameters:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y</font>: the grid cell's coordinates where you want to put the object.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">z</font>: the object's coordinate on the z axis, refering to it's base. You can use <font face="Courier New" color="#0000ff">TOP</font> to put it just over the highest object there, like if it hat fallen from the sky. This is useful to build stacks of objects, each one just over the previous, withouth calculating each object's z coordinate.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">height</font>: the object's height.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the object's map. If you use <font face="Courier New" color="#0000ff">NULL</font>, the object will not be drawn, but it will be there for everithing else (collisions, etc.).</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">shadow</font>: the object's shadow. If you use <font face="Courier New" color="#0000ff">NULL</font>, the object will have no shadow.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+The object's <font face="Courier New" color="#0000ff">identifier</font> if it worked, <font face="Courier New" color="#0000ff">ID_ERROR</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f17"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To put a free object on the room you must use the function:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">ism_id ism_put_free_object(int x, int y, int z, int widthx, int widthy, int height, BITMAP *map, BITMAP *shadow);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Puts a free object on the isometric view.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=6>
+Parameters:</td>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">x, y, z</font>: the coordinates where the object must be placed, refering to the leftmost point of it's base.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">widthx, widthy</font>: the widths of the object on it's X and Y dimensions.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">height</font>: the object's height.</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the object's map. If you use <font face="Courier New" color="#0000ff">NULL</font>, the object will not be drawn, but it will be there for everithing else (collisions, etc.).</td>
+</tr>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">shadow</font>: the object's shadow. If you use <font face="Courier New" color="#0000ff">NULL</font>, the object will have no shadow.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+The <font face="Courier New" color="#0000ff">identifier</font> of the object if it worked, <font face="Courier New" color="#0000ff">ID_ERROR</font> if it failed.</td>
+</tr>
+</table>
+<br>
+
+<a name="f12"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To get a certain data about an object:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_get_object_data(ism_id id, unsigned char data);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Returns the requested object's data.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">data</font>: the data you want to know about the object. Possible values are: <font face="Courier New" color="#0000ff">D_X</font> (the x coordinate), <font face="Courier New" color="#0000ff">D_Y</font> (the y coordinate), <font face="Courier New" color="#0000ff">D_Z</font> (the z coordinate), <font face="Courier New" color="#0000ff">D_WIDTH_X</font> (width on the x dimension), <font face="Courier New" color="#0000ff">D_WIDTH_Y</font> (width on the y dimension), <font face="Courier New" color="#0000ff">D_HEIGHT</font> (height) and <font face="Courier New" color="#0000ff">D_TRANSP</font> (the object's transparency percentage).</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Notes:</td>
+<td valign="top" width="77%" height=17>
+Asking about a grid object's x or y coordinate will return the x or the y of it's grid cell.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+The requested data if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table></br>
+<a name="f11"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There's an easier way to get an object's coordinates than three calls to the previous function:<br>
+</br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_get_object_coords(ism_id id, int *dstx, int *dsty, int *dstz);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Stores the object's coordinates on the given variables.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">dstx, dsty, dstz</font>: the variables where the function will store the object's coordinates.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Notes:</td>
+<td valign="top" width="77%" height=17>
+If the object is a grid one, the value stored on <font face="Courier New" color="#0000ff">dstx</font> and <font face="Courier New" color="#0000ff">dsty</font> will be the x or the y of it's grid cell.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f01"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To modify a given data about an object, use the following function:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_change_object_data(ism_id id, unsigned char data, int value, unsigned char mode);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Modifies the requested object's data.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=4 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">data</font>: the object's data that you want to modify. Possible values are: <font face="Courier New" color="#0000ff">D_X</font> (the x coordinate), <font face="Courier New" color="#0000ff">D_Y</font> (the y coordinate), <font face="Courier New" color="#0000ff">D_Z</font> (the z coordinate), <font face="Courier New" color="#0000ff">D_WIDTH_X</font> (width on the x dimension), <font face="Courier New" color="#0000ff">D_WIDTH_Y</font> (width on the y dimension), <font face="Courier New" color="#0000ff">D_HEIGHT</font> (height) and <font face="Courier New" color="#0000ff">D_TRANSP</font> (the object's transparency percentage).</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">value</font>: the new value to be assigned to the requested data.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">mode</font>: the way you want to change the data. You can use <font face="Courier New" color="#0000ff">CHANGE</font> to change the old data by <font face="Courier New" color="#0000ff">value</font>, or <font face="Courier New" color="#0000ff">ADD</font> to add <font face="Courier New" color="#0000ff">value</font> to it.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Notes:</td>
+<td valign="top" width="77%" height=17>
+An error will occur if you try to change a grid object's x or y coordinate, it's width, or it's transparency percentage.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f14"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;And to change an object's coordinates on an easy way, just use this:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_move_object(ism_id id, int x, int y, int z, unsigned char mode);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Modifies an object's coordinates.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=3 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y, z</font>: the new coordinate's values.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">mode</font>: the way you want to move the object. You can use <font face="Courier New" color="#0000ff">CHANGE</font> to move the object to <font face="Courier New" color="#0000ff">x, y, z</font>, or <font face="Courier New" color="#0000ff">ADD</font> to add <font face="Courier New" color="#0000ff">x, y, z</font> to the previous coordinates.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Notes:</td>
+<td valign="top" width="77%" height=17>
+An error will occur if you try to move a grid object with this function.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f02"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To change an object's map:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_change_object_map(ism_id id, BITMAP *map);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Changes an object's image.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">map</font>: the map with the new object's image.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f03"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To change an object's shadow:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_change_object_shadow(ism_id id, BITMAP *shadow);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Changes an object's shadow.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2>
+Parameters:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">shadow</font>: the map with the new object's shadow.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f19"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The function to remove an object is:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_remove_object(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Removes an object from the isometric view.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f16"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To know if a certain object does exist:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_object_exists(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Says if there is an object with the given identifier.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the object's identifier.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">1</font> if the object exists, <font face="Courier New" color="#0000ff">0</font> if not.</td>
+</tr>
+</table>
+<br>
+<a name="f06"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Finally, to remove all objects, walls and floor tiles:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_empty_isom_world(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Completely empties the isometric world.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+None.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<br>
+<a name="f09"></a>
+<font size=4>- <a name="col"></a>Collision detection</font>
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If, when trying to move an object, it chrashes against another one, against a wall, or against the floor, the called function will return an error, and the movement will not be done. Appart from that, the identifiers of all object, walls, etc. against it had crashed will be stored on an engine's inner stack. To take a look at this stack and see what the object collided with, you can use succesive calls to the following function:<br><br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_get_coll_id(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Extracts an identifier from the collisions stack.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+None.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">NO_ID</font> if the last object you tried to move crashed against nothing, or if you've already extracted all the identifiers from the collisions stack on previous calls to this function, the identificator of an object against it collided with, or <font face="Courier New" color="#0000ff">ID_HIGH_X_WALL</font>, <font face="Courier New" color="#0000ff">ID_HIGH_Y_WALL</font>, <font face="Courier New" color="#0000ff">ID_LOW_X_WALL</font>, <font face="Courier New" color="#0000ff">ID_LOW_Y_WALL</font> or <font face="Courier New" color="#0000ff">ID_FLOOR</font> if it crashed against a wall or against the floor.</td>
+</tr>
+</table>
+<br>
+<a name="f24"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you want to know if the last move object collided against a given object, wall, or against the floor:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_collided_against(ism_id id);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Checks if the last moved object has collded against the floor, a given wall or a given object.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">id</font>: the id of the object you want to check, or <font face="Courier New" color="#0000ff">ID_HIGH_X_WALL</font>, <font face="Courier New" color="#0000ff">ID_HIGH_Y_WALL</font>, <font face="Courier New" color="#0000ff">ID_LOW_X_WALL</font>, <font face="Courier New" color="#0000ff">ID_LOW_Y_WALL</font> or <font face="Courier New" color="#0000ff">ID_FLOOR</font> if you want to check the walls or the floor.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+<font face="Courier New" color="#0000ff">1</font> if the last moved object collided against the given object, wall or floor, <font face="Courier New" color="#0000ff">0</font> if not.</td>
+</tr>
+</table>
+<br>
+<a name="f25"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you want to know how many objects, including walls and the floor, the last moved object collided with:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_collisions_number(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Returns the number of objects, including the walls and floor, against wich the last moved object collided with.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+None.</td>
+</tr>
+<tr><td valign="top" width="23%" height=17>
+Returns:</td>
+<td valign="top" width="77%" height=17>
+The nomber of objects, including the walls and floor, against wich the last moved object collided with.</td>
+</tr>
+</table>
+<br><br>
+<a name="f10"></a>
+<font size=4>- <a name="coorej"></a>Grid coordinates</font>
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When using the engine functions to ger a grid object's coordinates, what you get for x and y is not their axis based real coordinates, what we can call "free coordinates", but the ones refered to their position on the grid, what we can call "grid coordinates". Most of the time this must be more than enough for our purpouses, but sometimes it can be useful to translate coordinates from one format to the other, when comparing the positions of a grid object and a free one, or to calculate the distance from one to the other, for example. To do this, we have the two following functions:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_get_free_coords(int x, int y, int *fx, int *fy);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Gets the x and y coords, refered to the coordinates axis, of the leftmost point of a grid's cell.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: the cell's grid coords.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">fx, fy</font>: pointers to the variables where you want the free x and y to be stored.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f08"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_get_cell_coords(int x, int y, int *cx, int *cy);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Gets the grid coordinates of the cell over wich a certain point is placed.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x, y</font>: x and y free coords of the given point.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xc, yc</font>: pointers to the variables where you want the grid x and y to be stored.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><br>
+
+<a name="f32"></a>
+<font size=4>- <a name="convc"></a>Converting between 2d and 3d coordinates</font>
+<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When using Isomot, you will tipycally use two kind of coordinates, the 2d ones refering to your bitmaps, and the 3d ones from your isometric world. Sometimes, you may want to translate coordinates between thos two kinds (to use the mouse, for example). You can do this with the two following functions:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_coords_iso_to_2d(int xiso, int yiso, int ziso, int *x2d, int *y2d);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Turns 3d isometric coordinates into their 2d bitmap equivalents. That is, tells you where a certain isometric point will be drawn on your destination bitmap.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xiso, yiso, ziso</font>: the isometric coordinates you want to translate into 2d.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x2d, y2d</font>: pointers to the variables where you want the 2d x and y to be stored.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Comments:</td>
+<td valign="top" width="77%">
+The returned 2d coordinates refer to the bitmap where you are drawing your isometric world, and where on it are you are drawing the isometric origin of coordinates, that is, the three parameters of your last call to <a href="#f05">ism_draw_isom_world(BITMAP *map_dest, int x0, int y0);</a>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><a name="f31"></a>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_coords_2d_to_iso(int *xiso, int *yiso, int *ziso, int x2d, int y2d, int fixedv, unsigned char fixedc);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Turns 2d bitmap coordinates into their 3d isometric equivalents. That is, tells what's the isometric point that's aligned with a certain 2d point of your destination bitmap and is into a certain plane.</td>
+</tr>
+
+<tr>
+<td valign="top" width="23%" rowspan=3 height=8>Parameters:</td>
+
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">xiso, yiso, ziso</font>: pointers to the variables where you want the isometric coordinates to be stored.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x2d, y2d</font>: x and y of the 2d bitmap point.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">fixedv, fixedc</font>: the plane that contains the isometric point. It must be parallel to the x, y or z plane, so <font face="Courier New" color="#0000ff">fixedc</font> can be D_X, D_Y or D_Z</font>, while <font face="Courier New" color="#0000ff">fixedv</font> is the coordinate of that plane.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Comments:</td>
+<td valign="top" width="77%">
+Please note that a 2d bitmap point doesn't give you a single isometric point, but a whole line that's perpendicular to the bitmap, so to give you a single point, that line must be intersected by a plane, and that's the one you must tell the function with the last two parameters. For example, if you want to know about an iso point on the floor that's at your 2d bitmap coordinates, <font face="Courier New" color="#0000ff">fixedv</font> must be 0 and <font face="Courier New" color="#0000ff">fixedc D_Z</font>.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><br>
+
+<a name="f22"></a>
+<font size=4>- <a name="somb"></a>Shadows</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When placing new objects, we can define the shape of the shadow they cast over the floor and the other objects just below it, using the <font face="Courier New" color="#0000ff">shadow</font> parameter. This parameter is just a map with a mask showing the shape of the shadow. The drawing intensity of the shadows is a 50% by default, but you can change this percentage with the following function:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_shadowing_percentage(char shadowper);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets the shadowing percentage between 0% (no shadows) and 100% (full black shadows).</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">shadowper</font>: shadowing percentage to set.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><br>
+<font size=4>- <a name="transp"></a>Transparent objects</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Another one of free object's posibilities is a certain transparency level. All free objects are created with a 0% transparency level by default, but you can change it between 0 (opaque) and 100 (totally invisible) using the <font face="Courier New" color="#0000ff">ism_change_objet_data</font> function, telling it to modify the <font face="Courier New" color="#0000ff">D_TRANSP</font> data. You can check an object's transparency level too, just by using the <font face="Courier New" color="#0000ff">ism_get_objet_data</font> function, telling it to give you the <font face="Courier New" color="#0000ff">D_TRANSP</font> data. As an extra detail, and to give it a touch of realism, the more transparent an object is, the lighter it's shadow will be casted.<br><br>
+<a name="#f26"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To draw transparent objects, Isomot uses the standard Allegro functions. As we all know, they are not very fast, so if you want Isomot to use your own functions, or any other library ones, like FBlend for example (I recommend you this one, make a search for it on <a href="www.allegro.cc">www.allegro.cc</a> for more info about it), you can tell Isomot using the following function:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_transp_func(void(*f_transp)(BITMAP *, BITMAP *, int, int, int));</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets the function Isomot must use to draw transparent objects.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">f_transp</font>: the transparency function to be used.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Comments:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">f_transp</font> must be a function returning void, and taking the following parameters: (BITMAP *src, BITMAP *dst, int x, int y, int fact), where src and dst are the source and destiny maps (that is, src will be drawn on dst), x and y are the coordinates of dst where scr will be drawn, and fact is the transparency factor, ranging from 0 (what's a 100% transparency level) to 255 (0%). This is just the same declaration as the one for the <font face="Courier New" color="#0000ff">fblend_trans</font> function from the FBlend library, and that's not a coincidence ;). So, if you use FBlend on your project, you just have to call <font face="Courier New" color="#0000ff">ism_set_transp_func(fblend_trans);</font> fot Isomot to use it, instead of the Allegro standard blenders.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br><br>
+<a name="f05"></a>
+<font size=4>- <a name="dib"></a>Drawing the isometric view</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;All right. We have defined the grid, we have asigned bitmaps to the walls and floor tiles, and we have inserted a few objects. How can we see now the results of all this work? Easy. Just call the following function:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_draw_isom_world(BITMAP *map_dest, int x0, int y0);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Draws the isometric view to a given map.</td>
+</tr>
+<tr><td valign="top" width="23%" rowspan=2 height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">map_dest</font>: the bitmap where you want the isometric view to be drawn.</td>
+</tr>
+<tr><td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">x0, y0</font>: the point of <font face="Courier New" color="#0000ff">map_dest</font> where you want the (0,0,0) point to be drawn.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table><br>
+<a name="f29"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Appart from this, you can tell Isomot to draw the isometric world darkened using a given percentage, so you can show a room at night, or whatever you want. You can tell Isomot what percentage to use with the following:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">int ism_set_gloom_percentage(char gloomper);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Sets the darkening percentage to be used each time you call <a href="#dib">ism_draw_isom_world</a>.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">gloomper</font>: darkening percentage, from 0 (no darkening) to 100 (pitch black).</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+<font face="Courier New" color="#0000ff">0</font> if it worked, <font face="Courier New" color="#0000ff">-1</font> if it failed.</td>
+</tr>
+</table>
+<br>
+<a name="f30"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Isomot uses a "dirty rectangles" optimisation that can boost it's performance, but can give a few problems if you do some odd things like drawing the isometric view to more than one bitmap, or clear the target bitmap before each call to <a href="#dib">ism_draw_isom_world</a>. If this happens, you can disable the dirty rectangles using the following function:<br>
+<br>
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">void ism_enable_dirty_rect(char enable);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+enables or disables the dirty rectangles.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+<font face="Courier New" color="#0000ff">enable</font>: tells if you want to enable (value 1) or disable (value 0) the dirty rectangles (by default, they are allways enabled).</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+Nothing.</td>
+</tr>
+</table>
+<br><br>
+
+
+<a name="f07"></a>
+- <font size=4><a name="err"></a>Errors</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If a function returns an error, you will propably want to know what went wrong. You can get a description of the error calling the following function:<br>
+<br>
+
+<table border cellspacing=1 cellpadding=4 width=100%>
+<tr><td valign="top" colspan=2>
+<font face="Courier New" color="#0000ff">char *ism_error_desc(void);</font></td>
+</tr>
+<tr><td valign="top" width="23%">
+Description:</td>
+<td valign="top" width="77%">
+Returns a string with the error's explanation.</td>
+</tr>
+<tr><td valign="top" width="23%" height=8>
+Parameters:</td>
+<td valign="top" width="77%" height=8>
+None.</td>
+</tr>
+<tr><td valign="top" width="23%">
+Returns:</td>
+<td valign="top" width="77%">
+A string with the error's explanation.</td>
+</tr>
+</table><br>
+<br>
+
+- <font size=4><a name="lng"></a>The ism_lng.h file</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;As I've said before, Isomot has an Spanish/english bilingual interface. By default, you can use both interfaces withouth any problem, but the most probable thing, as you are reading the English version of these docs, is that you only are going to use the English functions. If that is the case you can avoid the Spanish interface compilation, reducing a bit the executable size and improving it a little too, by editing the ism_lng.h file and removing the ISM_ESP definition. It's true that none of the two advantages is really big, but every little thing helps.<br>
+<br><br>
+
+- <font size=4><a name="glos"></a>Functions summary</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The following is an alphabetically ordered list of all Isomot's functions. Click on them to see the detailed description of each one.<br><br>
+<a name="f1"></a>
+<a href="#f01">ism_change_object_data(ism_id id, unsigned char data, int value, unsigned char mode);</a><br>
+<a href="#f02">ism_change_object_map(ism_id id, BITMAP *map);</a><br>
+<a href="#f03">ism_change_object_shadow(ism_id id, BITMAP *shadow);</a><br>
+<a href="#f24">ism_collided_against(ism_id id);</a><br>
+<a href="#f25">ism_collisions_number(void);</a><br>
+<a href="#f32">ism_coords_2d_to_iso(int *xiso, int *yiso, int *ziso, int x2d, int y2d, int fixedv, unsigned char fixedc);</a><br>
+<a href="#f31">ism_coords_iso_to_2d(int xiso, int yiso, int ziso, int *x2d, int *y2d);</a><br>
+<a href="#f04">ism_destroy_all(void);</a><br>
+<a href="#f05">ism_draw_isom_world(BITMAP *map_dest, int x0, int y0);</a><br>
+<a href="#f06">ism_empty_isom_world(void);</a><br>
+<a href="#f30">ism_enable_dirty_rect(char enable);</a><br>
+<a href="#f07">ism_error_desc(void);</a><br>
+<a href="#f08">ism_get_cell_coords(int x, int y, int *cx, int *cy);</a><br>
+<a href="#f09">ism_get_coll_id(void);</a><br>
+<a href="#f10">ism_get_free_coords(int x, int y, int *fx, int *fy);</a><br>
+<a href="#f11">ism_get_object_coords(ism_id id, int *dstx, int *dsty, int *dstz);</a><br>
+<a href="#f12">ism_get_object_data(ism_id id, unsigned char data);</a><br>
+<a href="#f28">ism_move_floor(int offsetx, int offsety);</a><br>
+<a href="#f13">ism_move_floor_tile(int x, int y, int offsetx, int offsety);</a><br>
+<a href="#f14">ism_move_object(ism_id id, int x, int y, int z, unsigned char mode);</a><br>
+<a href="#f15">ism_move_wall(unsigned char axis, int wall, int offsetaxis, int offsetheight);</a><br>
+<a href="#f16">ism_object_exists(ism_id id);</a><br>
+<a href="#f17">ism_put_free_object(int x, int y, int z, int widthx, int widthy, int height, BITMAP *map, BITMAP *shadow);</a><br>
+<a href="#f18">ism_put_grid_object(int x, int y, int z, int height, BITMAP *map, BITMAP *shadow);</a><br>
+<a href="#f19">ism_remove_object(ism_id id);</a><br>
+<a href="#f27">ism_set_floor(BITMAP *map);</a><br>
+<a href="#f20">ism_set_floor_tile(BITMAP *map, int x, int y);</a><br>
+<a href="#f29">ism_set_gloom_percentage(char gloomper);</a><br>
+<a href="#f21">ism_set_grid(int x, int y, int width);</a><br>
+<a href="#f22">ism_set_shadowing_percentage(char shadowper);</a><br>
+<a href="#f26">ism_set_transp_func(void(*transp_f)(BITMAP *, BITMAP *, int, int, int));</a><br>
+<a href="#f23">ism_set_wall(BITMAP *map, unsigned char axis, int wall);</a><br>
+<br><br>
+
+- <font size=4><a name="cons"></a>Programming tips</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First of all, try to keep the grid and the number of object as small as possible. This way the engine will use less memory and work faster (obvious, isn't it?).<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You can't move a grid object on the X or Y axis (appart from other restrictions), so you will probably think on setting all your objects as free ones. Don't do that! Grid objects are much faster to handle, and use much less memory than free ones.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you are going to handle various objects, don't start with one until you have finished with the previous. For example:<br>
+<font face="Courier New" color="#0000ff">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x1=ism_get_object_data(obj1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_modify_object_data(obj1,x1+1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x2=ism_get_object_data(obj2,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_modify_object_data(obj2,x2+1,D_X);<br>
+</font>
+&nbsp;&nbsp;&nbsp;will work much faster than:<br>
+<font face="Courier New" color="#0000ff">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x1=ism_get_object_data(obj1,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x2=ism_get_object_data(obj2,D_X);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_modify_object_data(obj1,D_X,x1+1);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ism_modify_object_data(obj2,D_X,x2+1);<br>
+</font>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The toutines that draw shadows are optimized for for certain shadowing percentages, so they work much faster with then set. Those percentages are, for 24 and 32 color depth maps, 50%, 75%, 87%, 93%, 97%, 98%, 99% and 100%, and for 15 and 16 bits, 47%, 48%, 49%, 50%, 72%, 73%, 74%, 75%, 85%, 86%, 87%, 91%, 92%, 93%, 97%, 98%, 99%, y 100%. I know they look strange, but there is a perfectly logical reason for those percentages to be the optimized ones, and not others ;)<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The posibilities of the <font face="Courier New" color="#0000ff">ism_set_transp_func</font> function are much more than improve the drawing of transparent objects; you can write your own function and use the transparency level to apply special effects to the objects, like darkening them, drawing them black and white, draw transparent only certain color components, or anything you can think.<br>
+<br><br>
+
+- <font size=4><a name="hist"></a>History</font><br>
+<br>
+* 18/05/2000 v1.0.<br>
+- Added the <a href="#f31">ism_coords_iso_to_2d</a> and <a href="#f32">ism_coords_2d_to_iso</a> functions, to convert from 2d bitmap and 3d isometric coordinates.<br>
+- Dirty rectangles are now disabled by default. If you want them, you must enable them with <a href="#f30">ism_enable_dirty_rect</a>.<br>
+- Improved C++ compatibility.<br>
+- Minor bugfixes here and there.<br>
+<br>
+* 27/05/2005 vb0.5.<br>
+- Added the <a href="#f27">ism_set_floor</a> and <a href="#f28">ism_move_floor</a> functions, to draw the floor using a single bitmap, appart from a tiled mosaic.<br>
+- Added the <a href="#f29">ism_set_gloom_percentage</a> so you can tell Isomot to draw the room darkened by the given percentage.<br>
+- Aadded a dirty rectangles optimisation, and the <a href="#f30">ism_enable_dirty_rect</a>, to disable it if neccesary.<br>
+- Acouple of not very important bugfixes.<br>
+<br>
+* 02/11/2004 vb0.4.<br>
+- This version was never made public, as it only had a couple of minor changes.<br>
+<br>
+* 01/08/2003 vb0.3.<br>
+- Added the <a href="#f24">ism_collided_against</a> and <a href="#f25">ism_collisions_number</a> functions, to make collision detection easier (thanks to Ron Ophir for the idea).<br>
+- Support for transparent objects.<br>
+- Optimized shadow casting.<br>
+<br>
+* 30/04/2003 vb0.2.<br>
+- Support for any color depth bitmaps.<br>
+- Added the ism_lng file for interface optimisation.<br>
+- Just from the start, Isomot was planned to be a C project, but I has ben compilin it all this time as a C++ project withouth noticing it. This caused a lot of errors to appear when I compiled as plain C. All of them are fixed now (thanks to Neil Walker for the tip).<br>
+- A couple of minor optimisations and bugfixes.<br>
+<br>
+* 22/03/2003 vb0.1<br>
+- First public beta.<br>
+<br><br>
+- <font size=4><a name="agr"></a>Acknowledgements</font><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A lot of people have helped me on this project, my Retrospec colleagues the most: I owe Tomaz Kak the masking shadowing method, Isomot's logo is based on an idea by Dan Condon-Jones, Neil Walker helped me a lot to debug and optimise the code, and all the others, Arif Majothi, Bill Harbison, Graham Goring, Jeff Brayne, John Dow, Matthew Smith, Peter Jovanovic, Richard Jordan and Russ Hoy, have helped me a lot with their comments and support. I&ntilde;aki Mart&iacute;nez and Ron Ophir have helped a lot too, with their valuable comments and cooperation. And I want to say thanks too to all people that have e-mailed me about the project, encouraging me to finish it. 
+<br><br>
+
+<hr width="100%">
+<center>&copy;2008 - Ignacio P&eacute;rez Gil.<br>Ignacio's SP Remakes logo by Ric Lumb.</center>
+
+</font>
+</body>
+</html>
