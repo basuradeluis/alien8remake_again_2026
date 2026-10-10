@@ -42,7 +42,7 @@ void ini_audio(void)
 
  install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
 
- FMOD_System_Create(&sistema);
+ FMOD_System_Create(&sistema, FMOD_VERSION);
  FMOD_System_Init(sistema, 16, FMOD_INIT_NORMAL, NULL);
 
  f_msc = load_datafile("msc.dat");
@@ -81,14 +81,14 @@ void reproducir_musica(char n)
      if(msc_fin)
       {
        inf_tm.length=long_msc_fin;
-       FMOD_System_CreateStream(sistema, msc_fin, FMOD_HARDWARE | FMOD_LOOP_OFF | FMOD_OPENMEMORY, &inf_tm, &sm);
+       FMOD_System_CreateStream(sistema, msc_fin,  FMOD_LOOP_OFF | FMOD_OPENMEMORY, &inf_tm, &sm);
       }
      else
       {
        inf_tm.length=f_msc[n].size;
-       FMOD_System_CreateStream(sistema, (const char *)(f_msc[n].dat), FMOD_HARDWARE | FMOD_LOOP_NORMAL | FMOD_OPENMEMORY, &inf_tm, &sm);
+       FMOD_System_CreateStream(sistema, (const char *)(f_msc[n].dat),  FMOD_LOOP_NORMAL | FMOD_OPENMEMORY, &inf_tm, &sm);
       }
-     FMOD_System_PlaySound(sistema, FMOD_CHANNEL_FREE, sm, 1, &canal_musica);
+     FMOD_System_PlaySound(sistema,  sm, NULL, 1, &canal_musica);
      FMOD_Channel_SetVolume(canal_musica,vol_mus);
      FMOD_Channel_SetPaused(canal_musica,0);
     }
