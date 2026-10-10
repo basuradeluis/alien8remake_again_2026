@@ -37,7 +37,7 @@ gcc *.o -o mi_programa -lalleg -lcurl -lfmod
 Al arrancar sale pantalla negra y nada mas
 
 
-SUCIO{}
+SUCIO{
 gcc -llibfmod -lalleg -lcurl *.c
 gcc -libfmod -lalleg -lcurl *.c
 gcc *.o -o mi_programa -lalleg -lcurl
