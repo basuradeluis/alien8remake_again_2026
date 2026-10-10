@@ -3,9 +3,9 @@
 #include "stdio.h"
 
 // USE HERE THE PROPER DEFINITION FOR THE OS YOU ARE COMPILING DEFLEKTOR ON 
-#define INTT_WIN // Windows
+//#define INTT_WIN // Windows
 //#define INTT_MAC // Macintosh
-//#define INTT_LNX // Linux
+#define INTT_LNX // Linux
 //#define INTT_OTR // Other
 
 #ifdef INTT_WIN

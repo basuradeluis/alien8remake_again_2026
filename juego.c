@@ -690,7 +690,7 @@ void reprogramar(void)
  destroy_bitmap(buffer2);
  destroy_bitmap(txt_rep);
 }
-#undef fm_pausa(_N_)
+#undef fm_pausa
 
 #define fm_escribir_centrado(_T_,_Y_)\
   clear_to_color(bmptxt,ct);\
@@ -960,7 +960,7 @@ void mostrar_resultado(void)
  while(!tcj_estado[TCJ_AC0] && !tcj_estado[TCJ_AC1] && !tcj_estado[TCJ_AC2] &&
        !tcj_estado[TCJ_AC3] && !tcj_estado[TCJ_AC4]);
 }
-#undef fm_escribir_centrado(_T_,_Y_)
+#undef fm_escribir_centrado
 
 //******************************************************************************
 // Función fin_juego()
@@ -2781,8 +2781,14 @@ void mov_plasma(char f)
        mov_empujar(f,dato,dif);
        i=ism_cambiar_dato_objeto(movs[f].id,dato,dif,SUMAR);
       }
-     else
-       (dato==D_X?movs[f].m0:movs[f].m1)=(dif<0?-1:1);
+     else {
+       int aux=(dif<0?-1:1);
+        if (dato==D_X)
+          movs[f].m0=aux;
+        else
+          movs[f].m1=aux;
+       //OLD CODE: (dato==D_X?movs[f].m0:movs[f].m1)=(dif<0?-1:1);
+    }
      if(!i && mover_n)
        for(i=0;i<3;i++)
          if(movs[f].id==movs[i].anclado)
@@ -2805,8 +2811,13 @@ void mov_plasma(char f)
            mov_empujar(f,dato,dif);
            i=ism_cambiar_dato_objeto(movs[f].id,dato,dif,SUMAR);
           }
-         else
-           (dato==D_X?movs[f].m0:movs[f].m1)=dif;
+         else{
+           if (dato==D_X)
+              movs[f].m0=dif;
+           else
+              movs[f].m1=dif;
+           //OLD CODE (dato==D_X?movs[f].m0:movs[f].m1)=dif;
+         }
          if(!i)
            for(i=1;i<num_movs;i++)
              if(movs[f].id==movs[i].anclado)

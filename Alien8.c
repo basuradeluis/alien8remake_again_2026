@@ -674,7 +674,7 @@ char opciones(void)
  escribir_cfg();
  return elegida;
 }
-#undef fm_num_pctj(_N_)
+#undef fm_num_pctj
 
 //******************************************************************************
 // Función preguntar()
@@ -895,7 +895,7 @@ char preguntar(void)
  reproducir_sonido(23,PLAYMODE_PLAY);
  return EST_MENU;
 }
-#undef fm_escribir_centrado(_T_,_Y_)
+#undef fm_escribir_centrado
 
 //******************************************************************************
 // Función redefinir()
