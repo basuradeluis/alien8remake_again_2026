@@ -1240,7 +1240,8 @@ void leer_cfg(void)
  else
   {
    idioma=2;
-   volmus=volson=100;
+   volmus=50;
+   volson=100;
    pantalla_completa=0;
    nuevo_marcador=1;
    teclas_control[0]=KEY_LEFT;
