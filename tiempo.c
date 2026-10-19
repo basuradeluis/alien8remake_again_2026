@@ -13,25 +13,20 @@
 //******************************************************************************
 // Variable global del temporizador.
 //******************************************************************************
-volatile char tic_reloj=0;
+volatile char tic_reloj = 0;
 
 //******************************************************************************
 // Inicializa el temporizador.
 //******************************************************************************
-void ini_tiempo(void)
-{
- LOCK_FUNCTION(temporizador);
- LOCK_VARIABLE(tic_reloj);
+void ini_tiempo(void) {
+  LOCK_FUNCTION(temporizador);
+  LOCK_VARIABLE(tic_reloj);
 
- install_int_ex(temporizador,BPS_TO_TIMER(TICKS));  
+  install_int_ex(temporizador, BPS_TO_TIMER(TICKS));
 }
 
 //******************************************************************************
 // Función del temporizador.
 //******************************************************************************
-void temporizador(void)
-{
- tic_reloj=1;
-}
-END_OF_FUNCTION (temporizador);
-
+void temporizador(void) { tic_reloj = 1; }
+END_OF_FUNCTION(temporizador);
