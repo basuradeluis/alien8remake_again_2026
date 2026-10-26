@@ -531,7 +531,7 @@ void dibujar_a_luz(void) {
 //    Secuencia de "reprogramación".
 //******************************************************************************
 void reprogramar(void) {
-  int f, x, y;
+  int f, x, y, transp;
   BITMAP *buffer2 = create_bitmap(RES_X, RES_Y);
   BITMAP *txt_rep = create_bitmap(384, 48);
 
@@ -698,6 +698,22 @@ void reprogramar(void) {
       if (f == -9)
         reproducir_sonido(14, PLAYMODE_PLAY);
     }
+
+  // Aniadido 2026 luis
+  for (transp = 0; transp < 99; transp = transp + 5) {
+    ism_cambiar_dato_objeto(movs[0].id, D_TRANSP, transp, CAMBIAR);
+    ism_dibujar_mundo_isom(buffer, x_org, y_org);
+    fm_volcar();
+    fm_pausa(5);
+  }
+
+  // Aniadido 2026 luis
+  for (transp = 0; transp < 95; transp = transp + 5) {
+    ism_establecer_oscuridad(transp);
+    ism_dibujar_mundo_isom(buffer, x_org, y_org);
+    fm_volcar();
+    fm_pausa(7);
+  }
 
   if (!tcj_estado[TCJ_AC3])
     do {
