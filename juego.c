@@ -13,6 +13,9 @@
 #include "tcj.h"
 #include "audio.h"
 
+extern int globalLuisHabitacionInicial;
+extern int globalLuisMostrarFinalJuego;
+
 unsigned char h;
 char puerta[4];
 unsigned char dx, dy;
@@ -348,6 +351,9 @@ char juego(void) {
   } while (!terminar && dt_partida.cerraduras < 24 && dt_partida.vidas >= 0 &&
            (pos_a_luz[0] < 180 || pos_a_luz[1] < 180 || pos_a_luz[2] < 180 ||
             pos_a_luz[3] < 180));
+
+  if (globalLuisMostrarFinalJuego)
+    detener_nave();
 
   detener_sonidos(1);
   parar_musica();
@@ -3947,6 +3953,9 @@ void ini_partida(void) {
     h = ph[2];
   if (key[KEY_F4])
     h = ph[3];
+
+  if (globalLuisHabitacionInicial != -1)
+    h = globalLuisHabitacionInicial;
 
   movs[0].m0 = ANCHO_CELDA * 5 - 6;
   movs[0].m1 = ANCHO_CELDA * 5 + 7;

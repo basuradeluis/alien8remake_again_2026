@@ -4,27 +4,12 @@
 // Por Ignacio Pérez Gil 18/05/2008.
 //******************************************************************************
 
-// Mi madre era una minipime,
-// mi padre era un transistó,
-// y escuchando un disco de Kraftwerk
-// mi padre a mi madre la antena le metió.
-//
-// Le echó dos voltios sin sacarla, la antena,
-// y de allí nasío yo.
-// Y aunque soy una máquina mecánica soy,
-// la vergüensa de tó los robó.
-//
-// Soy un consoladó,
-// soy una máquina de haser el amor,
-// si quieres que te haga felí,
-// llévame muy dentro, muy dentro de ti.
-//
-//                    Soy una máquina de haser el amor - Mojinos Escozíos
-
 //******************************************************************************
 // Includes.
 //******************************************************************************
 #include <string.h>
+#include <strings.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <allegro.h>
 #include "tiempo.h"
@@ -49,20 +34,105 @@ void escribir_cfg(void);
 void elegir_idioma(void);
 void intro(void);
 
+void checkParameters(int argc, char *argv[]);
+int globalLuisIntroDesactivada = 0;
+int globalLuisHabitacionInicial = -1;
+int globalLuisMostrarFinalJuego = 0;
+int globalLuisJugarDirectamente = 0;
+
+//******************************************************************************
+// Funcion checkParameters()
+//    Procesa los parametros de linea de comandos.
+//******************************************************************************
+void checkParameters(int argc, char *argv[]) {
+  int i;
+  int habitacion;
+
+  puts("-nointro: deshabilitar intro");
+  puts("-habitacioninicial N: empezar en la habitacion N (0-128)");
+  puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final "
+       "del juego");
+  puts("-jugar: saltar menu principal y empezar a jugar directamente");
+
+  puts("\nF1-4 al empezar partida: habitacion inicial (5,42,90,113)");
+  puts("Pulsa Av Pag en la pantalla de opciones para activar un marcador "
+       "alternativo");
+
+  puts("\nF9: crear taburete auxiliar(beta)");
+  puts("F10: disparo (beta)");
+  puts("F11: para salida inmediata del juego\n");
+  puts("F12 + tecla 6: activar trampas (vidas y tiempo infinito)");
+  puts("F12 + tecla 7: inmune");
+  puts("F12 + tecla 8: dibujar lineas suelo");
+  puts("F12 + tecla 9: girar habitacion 180 grados");
+
+  fflush(stdout);
+
+  // TODO girar habitacion (en progreso/beta. Tiene un fallo con el hecho de
+  // que algunos objetos no tengan coordenada inicial en el arrary mapa.h y se
+  // asuma posiionc 0,0 (1,1; no recuerdo)
+
+  // TODO hace que inmune no sea afectado ni por desplazamiento de algunas
+  // baldosas ni las hace desaparecer
+  // TODO poner puerta secreta en habitaicon de repogramacion, pone algo mas
+  // ahi.-> La puerta es dificil
+  // TODO volar
+
+  // TODO knightlore mode, usar grafico de otro robot
+  // TODO al pulsar cierta tecla ir a habitacion X
+  // TODO hacer aparecer objeto X
+  // TODO grabar partida
+  // TODO: camara lenta, o ralentizar algunos objetos (ver habitacion 91, por
+  // ejemplo)
+
+  // TODO investigar habitacion 79 los bloques se comportan asi? y la 105 era
+  // asi?
+  // TODO extraer img
+
+  for (i = 0; i < argc; i++) {
+    if (!(strcasecmp(argv[i], "-help")) || !(strcasecmp(argv[i], "--help"))) {
+      exit(0);
+    }
+
+    if (!(strcasecmp(argv[i], "-nointro"))) {
+      globalLuisIntroDesactivada = 1;
+    }
+    if (!(strcasecmp(argv[i], "-habitacioninicial"))) {
+      habitacion = (i + 1 < argc) ? atoi(argv[i + 1]) : -1;
+      if ((habitacion < 0) || (habitacion > 128 /* HAB_REPROGRAMANDO */)) {
+        printf("Habitacion debe estar entre 0 y 128: %d\n", habitacion);
+        habitacion = -1;
+      }
+      globalLuisHabitacionInicial = habitacion;
+      i++;
+    }
+    if (!(strcasecmp(argv[i], "-mostrarfinal"))) {
+      globalLuisMostrarFinalJuego = 1;
+    }
+    if (!(strcasecmp(argv[i], "-jugar"))) {
+      globalLuisJugarDirectamente = 1;
+    }
+  }
+}
+
 //******************************************************************************
 // Función main()
 //    Bucle principal.
 //******************************************************************************
-int main(void) {
+int main(int argc, char *argv[]) {
   char (*funcion_estado[6])(void) = {menu,     juego,     creditos,
                                      opciones, preguntar, redefinir};
   char estado = EST_MENU;
+
+  checkParameters(argc, argv);
 
   allegro_init();
   set_uformat(U_ASCII);
   leer_cfg();
   if (ini_video())
     return -1;
+  if (globalLuisJugarDirectamente)
+    estado = EST_JUEGO;
   if (comprobar_dats())
     return -1;
   ini_juego();
@@ -71,7 +141,8 @@ int main(void) {
   ini_audio();
 
   clear_bitmap(buffer);
-  intro();
+  if (!globalLuisIntroDesactivada)
+    intro();
   if (idioma == 2)
     elegir_idioma();
 
