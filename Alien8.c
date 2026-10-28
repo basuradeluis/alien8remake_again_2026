@@ -58,7 +58,9 @@ void checkParameters(int argc, char *argv[]) {
   puts("Pulsa Av Pag en la pantalla de opciones para activar un marcador "
        "alternativo");
 
+  // TODO explicar bien
   puts("\nF9: crear taburete auxiliar(beta)");
+  // TODO explicar bien
   puts("F10: disparo (beta)");
   puts("F11: para salida inmediata del juego\n");
   puts("F12 + tecla 6: activar trampas (vidas y tiempo infinito)");
@@ -129,12 +131,16 @@ int main(int argc, char *argv[]) {
   allegro_init();
   set_uformat(U_ASCII);
   leer_cfg();
-  if (ini_video())
+  if (ini_video()) {
+    printf("Error al inicializar el video\n");
     return -1;
+  }
   if (globalLuisJugarDirectamente)
     estado = EST_JUEGO;
-  if (comprobar_dats())
+  if (comprobar_dats()) {
+    printf("Error: faltan ficheros de datos (.dat)\n");
     return -1;
+  }
   ini_juego();
   ini_tiempo();
   ini_entrada();
