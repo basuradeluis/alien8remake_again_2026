@@ -1,0 +1,70 @@
+flowchart TB
+  subgraph APP["Aplicacion"]
+    A["Alien8.c<br/>main, bucle de estados<br/>menu / opciones / intro<br/>checkParameters, cfg"]
+  end
+
+  subgraph LOG["Logica de juego"]
+    J["juego.c<br/>partida, habitaciones<br/>movimiento y colisiones<br/>reprogramar, final"]
+  end
+
+  subgraph ENG["Motor isometrico"]
+    I["isomot.c<br/>rejilla, objetos, paredes<br/>dibujo, oscuridad"]
+    L["ism_lng.h<br/>textos ESP / ENG"]
+  end
+
+  subgraph SVC["Servicios"]
+    T["tcj.c<br/>teclado / joystick"]
+    AU["audio.c<br/>musica y sonidos"]
+    TI["tiempo.c<br/>ticks"]
+    N["internet.c<br/>HTTP"]
+  end
+
+  subgraph DAT["Datos"]
+    M["mapa.h<br/>habitaciones"]
+    D["*.dat<br/>graficos y sonido"]
+    C["cfg.dat<br/>scores.txt"]
+  end
+
+  subgraph LIB["Librerias"]
+    AL["Allegro"]
+    FM["FMOD"]
+    CU["libcurl"]
+  end
+
+  A -->|bucle de estados| J
+  A -->|inicializa| T
+  A -->|inicializa| AU
+  A -->|inicializa| TI
+  A -->|preguntar| N
+  A -->|lee / escribe| C
+
+  J -->|primitivas| I
+  J -->|entrada| T
+  J -->|sonido| AU
+  J -->|tiempo| TI
+  J -->|carga| M
+  J -->|carga| D
+
+  AU -->|carga| D
+
+  I --> L
+  I --> AL
+  T --> AL
+  TI --> AL
+  AU --> AL
+  AU --> FM
+  N --> CU
+
+  classDef app fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+  classDef log fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef eng fill:#fef3c7,stroke:#d97706,color:#78350f
+  classDef svc fill:#f3e8ff,stroke:#7c3aed,color:#4c1d95
+  classDef dat fill:#f1f5f9,stroke:#64748b,color:#334155
+  classDef lib fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+
+  class A app
+  class J log
+  class I,L eng
+  class T,AU,TI,N svc
+  class M,D,C dat
+  class AL,FM,CU lib
