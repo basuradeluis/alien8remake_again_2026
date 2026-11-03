@@ -293,6 +293,7 @@ void ini_juego() {
 char juego(void) {
   char f; //,tmp=1;
   int terminar = 0;
+  int pulsadoActivarTrampas = 0;
 
   puede_saltar = trampas = 0;
   dt_anim_nacho.cont = dt_anim_nacho.fot = dt_anim_nacho.tipo =
@@ -324,8 +325,12 @@ char juego(void) {
   do {
     reproducir_musica(1 + (dt_partida.cerraduras & 1));
     tcj_comprobar();
-    if (key[KEY_6] && key[KEY_F12]) {
-      trampas = 1;
+    if ((pulsadoActivarTrampas == 0) && (key[KEY_6]) && (key[KEY_F12])) {
+      trampas = (trampas + 1) % 2;
+      pulsadoActivarTrampas = 1;
+    }
+    if (!(key[KEY_6]) && !(key[KEY_F12])) {
+      pulsadoActivarTrampas = 0;
     }
 
     for (f = 0; f < num_movs; f++)
@@ -333,9 +338,13 @@ char juego(void) {
     if (sonido_empujar)
       sonido_empujar--;
     ism_dibujar_mundo_isom(buffer, x_org, y_org);
-    if (trampas)
-      textout_ex(buffer, font, "*", 10, 10, -1, -1);
-    else { // Se decrementa y dibuja el contador de años luz
+    int color1, color2;
+    color1 = makecol(255, 255, 0);
+    color2 = makecol(0, 0, 0);
+    if (trampas) {
+      textprintf_ex(buffer, font, 100, 60, color1, color2, "TRAMPAS ON ");
+    } else {
+      textprintf_ex(buffer, font, 100, 60, color1, color2, "            ");
       if (dec_pos_a_luz && dt_partida.cerraduras < 24) {
         dec_pos_a_luz = 0;
         decrementar_a_luz(3);
@@ -357,7 +366,7 @@ char juego(void) {
 
   detener_sonidos(1);
   parar_musica();
-  if (!terminar && !trampas) {
+  if (!terminar) {
     if (dt_partida.cerraduras < 24)
       reprogramar();
     else
