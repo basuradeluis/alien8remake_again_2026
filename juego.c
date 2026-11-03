@@ -15,6 +15,7 @@
 
 extern int globalLuisHabitacionInicial;
 extern int globalLuisMostrarFinalJuego;
+int salidaInmediata = 0;
 
 unsigned char h;
 char puerta[4];
@@ -341,6 +342,10 @@ char juego(void) {
     int color1, color2;
     color1 = makecol(255, 255, 0);
     color2 = makecol(0, 0, 0);
+    if (key[KEY_F11]) {
+      salidaInmediata = 1;
+      terminar = 1;
+    }
     if (trampas) {
       textprintf_ex(buffer, font, 100, 60, color1, color2, "TRAMPAS ON ");
     } else {
@@ -376,6 +381,10 @@ char juego(void) {
   detener_sonidos(1);
   if (terminar)
     reproducir_sonido(23, PLAYMODE_PLAY);
+
+  if (salidaInmediata)
+    return EST_SALIR;
+
   return (terminar || trampas || dt_partida.cerraduras == 0 ? EST_MENU
                                                             : EST_PREGUNTAR);
 }
