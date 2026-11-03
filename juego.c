@@ -383,6 +383,12 @@ char juego(void) {
 //******************************************************************************
 // Función decrementer_a_luz(char n)
 //    Calcula las nuevas posiciones de los números del marcador de años luz.
+//    Ritmo del contador de anos luz:
+//      60 fotogramas/s -> 30 decrementos/s.
+//      108.000 decrementos / 30 = 3.600 s = 1 hora.
+//      600,0 anos luz x 6 s = 1 hora.
+//      Cada digito completo de la rueda (18 decrementos) avanza cada 0,6 s;
+//      una unidad entera de ano luz (10 decimas) son 6 s.
 //******************************************************************************
 void decrementar_a_luz(char n) {
   pos_a_luz[n]--;
