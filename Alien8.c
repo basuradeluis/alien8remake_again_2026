@@ -63,6 +63,7 @@ void checkParameters(int argc, char *argv[]) {
   // TODO explicar bien
   puts("F10: disparo (beta)");
   puts("F11: para salida inmediata del juego\n");
+  puts("F12 + tecla 5: mostrar/ocultar informacion de depuracion");
   puts("F12 + tecla 6: activar trampas (vidas y tiempo infinito)");
   puts("F12 + tecla 7: inmune");
   puts("F12 + tecla 8: dibujar lineas suelo");

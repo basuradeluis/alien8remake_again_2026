@@ -3,6 +3,7 @@
 // Funciones del juego.
 // Por Ignacio Pérez Gil 18/05/2008.
 //******************************************************************************
+#include <stdio.h>
 #include <time.h>
 #include <allegro.h>
 #define _JUEGOC_
@@ -294,11 +295,15 @@ void ini_juego() {
 //******************************************************************************
 char juego(void) {
   char f; //,tmp=1;
+  char txtHabitacionActual[80];
+  int posXNacho, posYNacho, posZNacho;
   int terminar = 0;
   int pulsadoActivarTrampas = 0;
   int pulsadoActivarInmune = 0;
   int dibujarLineas = 0;
   int pulsadoDibujarLineas = 0;
+  int mostrarDebug = 0;
+  int pulsadoMostrarDebug = 0;
 
   puede_saltar = trampas = 0;
   dt_anim_nacho.cont = dt_anim_nacho.fot = dt_anim_nacho.tipo =
@@ -330,6 +335,14 @@ char juego(void) {
   do {
     reproducir_musica(1 + (dt_partida.cerraduras & 1));
     tcj_comprobar();
+    if ((pulsadoMostrarDebug == 0) && (key[KEY_5]) && (key[KEY_F12])) {
+      mostrarDebug = (mostrarDebug + 1) % 2;
+      pulsadoMostrarDebug = 1;
+    }
+    if (!(key[KEY_5]) && !(key[KEY_F12])) {
+      pulsadoMostrarDebug = 0;
+    }
+
     if ((pulsadoActivarTrampas == 0) && (key[KEY_6]) && (key[KEY_F12])) {
       trampas = (trampas + 1) % 2;
       pulsadoActivarTrampas = 1;
@@ -401,6 +414,41 @@ char juego(void) {
     int color1, color2;
     color1 = makecol(255, 255, 0);
     color2 = makecol(0, 0, 0);
+    // Informacion de depuracion (F12 + 5).
+    if (mostrarDebug) {
+      sprintf(txtHabitacionActual, "Hab: %d ", h);
+      textout_ex(buffer, font, txtHabitacionActual, 85, 10, -1, -1);
+
+      sprintf(txtHabitacionActual, "Cerraduras completadas(24): %d ",
+              dt_partida.cerraduras);
+      textout_ex(buffer, font, txtHabitacionActual, 155, 10, -1, -1);
+
+      sprintf(txtHabitacionActual, "                                     ");
+      textout_ex(buffer, font, txtHabitacionActual, 400, 30, -1, -1);
+      sprintf(txtHabitacionActual, "dirNacho: %d ", (signed int)movs[0].dir);
+      textprintf_ex(buffer, font, 400, 30, color1, color2, "dirNacho: %d ",
+                    (signed int)movs[0].dir);
+
+      ism_obtener_coords_objeto(movs[0].id, &posXNacho, &posYNacho, &posZNacho);
+
+      textprintf_ex(buffer, font, 100, 30, color1, color2, "Pos x: %3d",
+                    posXNacho);
+      textprintf_ex(buffer, font, 190, 30, color1, color2, "Pos y: %3d",
+                    posYNacho);
+      textprintf_ex(buffer, font, 100, 45, color1, color2, "Pos z: %3d",
+                    posZNacho);
+      textprintf_ex(buffer, font, 190, 45, color1, color2, "g: %3d", movs[0].g);
+    } else {
+      // Borra el bloque de depuracion con espacios, como los avisos.
+      textprintf_ex(buffer, font, 85, 10, color1, color2, "          ");
+      textprintf_ex(buffer, font, 155, 10, color1, color2,
+                    "                                ");
+      textprintf_ex(buffer, font, 400, 30, color1, color2, "               ");
+      textprintf_ex(buffer, font, 100, 30, color1, color2, "           ");
+      textprintf_ex(buffer, font, 190, 30, color1, color2, "           ");
+      textprintf_ex(buffer, font, 100, 45, color1, color2, "           ");
+      textprintf_ex(buffer, font, 190, 45, color1, color2, "       ");
+    }
     if (key[KEY_F11]) {
       salidaInmediata = 1;
       terminar = 1;
