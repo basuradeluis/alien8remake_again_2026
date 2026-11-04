@@ -120,6 +120,13 @@ struct {
   short g;
   char empujable;
 } movs[MAX_MOVS];
+
+/**
+.dir:   0: SurEste
+        1: SurOeste
+        2: NorOest
+        3: NorEste
+**/
 char primera_cascara;       // Índice de la primera cáscara.
 char primera_mina_voladora; // Índice de la primera mina voladora.
 
@@ -218,6 +225,8 @@ void ini_juego() {
   unsigned char f, n;
   int r, g, b;
 
+  // v2:IMPORTANTE: se sustituye para cada habitacion su "numero de objetos que
+  // contiene" por el "offset" del ultimo objeto. Ver cargar_habitacion.
   for (f = 1; f < NUM_HABS; f++)
     hab[f].n += hab[f - 1].n;
   buffer = create_bitmap(RES_X, RES_Y);
@@ -367,8 +376,13 @@ char juego(void) {
       pulsadoDibujarLineas = 0;
     }
 
+    /**************************************************************************/
+    // ESTO ES CASI LO MAS IMPORTANTE DEL JUEGO:
+    // MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO,
+    // CERRADURAS,LOSETAS Q SE MUEVEN...
     for (f = 0; f < num_movs; f++)
       movs[f].mover(f);
+    /**************************************************************************/
     if (sonido_empujar)
       sonido_empujar--;
     ism_dibujar_mundo_isom(buffer, x_org, y_org);
@@ -1398,11 +1412,12 @@ void cargar_hab(void) {
     ism_colocar_objeto_rejilla(6, 0, 0, 1000, NULL, NULL);
     ism_colocar_objeto_rejilla(7, 0, 0, 1000, NULL, NULL);
     ism_colocar_objeto_rejilla(8, 0, 0, 1000, NULL, NULL);
-    if (puertas & 0x01) {
+    if (puertas & 0x01) { // Hay puerta arriba dere.
       ism_colocar_loseta(mp_loseta, 4, 0);
       ism_colocar_loseta(mp_loseta, 5, 0);
       puerta[0] = 1;
     } else {
+      // Muro invisible para que no salir por donde habria una puerta.
       ism_colocar_objeto_rejilla(4, 0, 0, 1000, NULL, NULL);
       ism_colocar_objeto_rejilla(5, 0, 0, 1000, NULL, NULL);
     }
@@ -1633,9 +1648,23 @@ void cargar_hab(void) {
   num_obst = 0;
   num_movs = 6;
   rx = dx;
+  // v2 offset 0 o 1 indicando si es pasillo o no, mas o menos; o si hay
+  // desplazamiento por baldosa de puerta.
   ry = dy;
+  // Ojo, en algunas habitaciones, como en la 12, no se pone primero COLXY y
+  // luego objeto, sino que se pone directamente objeto aprovechando que dx y
+  // dy, y por lo tanto rx ry, valen 1 1.
+  // v2:Importante: ver comienzo de ini_juego. Offset objeto inicial y offset
+  // del obj final.
   for (f = (h ? hab[h - 1].n : 0); f < hab[h].n; f++) {
     int z = ENCIMA;
+    /*if (  (hab[h].banderas&1) & girarHabitacion  ){//v2 girar todas:
+            //1.1 -> 9.9
+            rx=10-rx;//girar //para las cuadradas, rx y ry estara entre [0,7]
+            ry=10-ry;
+
+            printf("especial Cambiado a %d %d\n",rx,ry);fflush(NULL);
+    }*/
     if (mapa_obj[f] >= COL00) // Cambio x/y
     {
       rx = (mapa_obj[f] & 0x07) + dx;
@@ -3396,6 +3425,8 @@ void mov_astronauta(char f) {
 //******************************************************************************
 // Función mov_nacho_andar(...)
 //    Mueve a Nacho cuando está andando.
+//    Tambien entra en esta funcion aunque no ande, si intento sumar
+//    directamente z++.
 //******************************************************************************
 void mov_nacho_andar(char f) {
   int colision = 0;
@@ -3726,6 +3757,9 @@ void mov_nacho_fotograma(void) {
       reproducir_sonido(25, PLAYMODE_PLAY);
     }
 
+    // int auxL=fot_nacho[dt_anim_nacho.fot];fflush(NULL);
+    // printf("Fotog: %d,%d\n",auxL, movs[0].dir *5+
+    // fot_nacho[dt_anim_nacho.fot] );
     if (inmune) {
       ism_cambiar_mapa_objeto(
           movs[0].id, fm_nacho(movs[0].dir, fot_nacho[dt_anim_nacho.fot]));
@@ -3829,8 +3863,11 @@ void mov_nacho_girar(char f) {
 //       Y luego con 0 automaticamente
 //******************************************************************************
 void mov_nacho_explotar(char f) {
-  if (inmune)
+  // printf("mov_nacho_explotar(char f) con: %d\n",f); fflush( stdout );
+  if (inmune) {
+    // printf("nacho toco algo mortal pero es inmune\n"); fflush( stdout );
     return;
+  }
   if (f) {
     if (movs[0].mover != mov_nacho_explotar) {
       if (movs[0].mover == mov_nacho_girar)
