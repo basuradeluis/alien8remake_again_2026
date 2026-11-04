@@ -297,6 +297,8 @@ char juego(void) {
   int terminar = 0;
   int pulsadoActivarTrampas = 0;
   int pulsadoActivarInmune = 0;
+  int dibujarLineas = 0;
+  int pulsadoDibujarLineas = 0;
 
   puede_saltar = trampas = 0;
   dt_anim_nacho.cont = dt_anim_nacho.fot = dt_anim_nacho.tipo =
@@ -344,11 +346,58 @@ char juego(void) {
       pulsadoActivarInmune = 0;
     }
 
+    if ((pulsadoDibujarLineas == 0) && (key[KEY_8]) && (key[KEY_F12])) {
+      dibujarLineas = (dibujarLineas + 1) % 2;
+      pulsadoDibujarLineas = 1;
+    }
+    if (!(key[KEY_8]) && !(key[KEY_F12])) {
+      pulsadoDibujarLineas = 0;
+    }
+
     for (f = 0; f < num_movs; f++)
       movs[f].mover(f);
     if (sonido_empujar)
       sonido_empujar--;
     ism_dibujar_mundo_isom(buffer, x_org, y_org);
+    if (dibujarLineas) { // Lineas orientativas de la rejilla isometrica.
+      int numColX, numColY;
+      int ceroX, ceroY, auxLineas;
+      int v22_x, v22_y;
+
+      if (hab[h].banderas & 1) { // Habitacion cuadrada.
+        numColX = 10;
+        numColY = 10;
+      } else {
+        if ((hab[h].x_p & 0x0f) == 5) { // Pasillo en y.
+          numColX = 4;
+          numColY = 10;
+        } else { // Pasillo en x.
+          numColX = 10;
+          numColY = 4;
+        }
+      }
+
+      // Eje z (verde).
+      ism_coords_iso_a_2d(0, 0, ALTURA_BASE * 3, &v22_x, &v22_y);
+      ism_coords_iso_a_2d(0, 0, 0, &ceroX, &ceroY);
+      line(buffer, ceroX, ceroY, v22_x, v22_y, makecol(0, 255, 0));
+
+      // Lineas paralelas al eje y (azul).
+      for (auxLineas = 0; auxLineas <= numColX; auxLineas++) {
+        ism_coords_iso_a_2d(auxLineas * ANCHO_CELDA, 0, 0, &ceroX, &ceroY);
+        ism_coords_iso_a_2d(auxLineas * ANCHO_CELDA, numColY * ANCHO_CELDA, 0,
+                            &v22_x, &v22_y);
+        line(buffer, ceroX, ceroY, v22_x, v22_y, makecol(0, 0, 255));
+      }
+
+      // Lineas paralelas al eje x (rojo).
+      for (auxLineas = 0; auxLineas <= numColY; auxLineas++) {
+        ism_coords_iso_a_2d(0, auxLineas * ANCHO_CELDA, 0, &ceroX, &ceroY);
+        ism_coords_iso_a_2d(numColX * ANCHO_CELDA, auxLineas * ANCHO_CELDA, 0,
+                            &v22_x, &v22_y);
+        line(buffer, ceroX, ceroY, v22_x, v22_y, makecol(255, 0, 0));
+      }
+    }
     int color1, color2;
     color1 = makecol(255, 255, 0);
     color2 = makecol(0, 0, 0);
