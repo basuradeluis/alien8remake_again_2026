@@ -39,6 +39,7 @@ int globalLuisIntroDesactivada = 0;
 int globalLuisHabitacionInicial = -1;
 int globalLuisMostrarFinalJuego = 0;
 int globalLuisJugarDirectamente = 0;
+int globalLuisSonidoDesactivado = 0;
 
 //******************************************************************************
 // Funcion checkParameters()
@@ -48,13 +49,15 @@ void checkParameters(int argc, char *argv[]) {
   int i;
   int habitacion;
 
+  puts("Argumentos e instrucciones:");
+  puts("-nosound: deshabilitar sonido");
   puts("-nointro: deshabilitar intro");
   puts("-habitacioninicial N: empezar en la habitacion N (0-128)");
   puts("-mostrarfinal: despues de perder todas las vidas, se mostrara el final "
        "del juego");
   puts("-jugar: saltar menu principal y empezar a jugar directamente");
 
-  puts("\nF1-4 al empezar partida: habitacion inicial (5,42,90,113)");
+  puts("\nPulsar F1-F4 al pulsar 'Comenzar': escogerhabitacion inicial (5,42,90,113)");
   puts("Pulsa Av Pag en la pantalla de opciones para activar un marcador "
        "alternativo");
 
@@ -97,6 +100,9 @@ void checkParameters(int argc, char *argv[]) {
       exit(0);
     }
 
+    if (!(strcasecmp(argv[i], "-nosound"))) {
+      globalLuisSonidoDesactivado = 1;
+    }
     if (!(strcasecmp(argv[i], "-nointro"))) {
       globalLuisIntroDesactivada = 1;
     }

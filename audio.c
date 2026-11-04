@@ -11,6 +11,8 @@
 #include <fmod.h>
 #include "audio.h"
 
+extern int globalLuisSonidoDesactivado;
+
 //******************************************************************************
 // Declaración de estructuras de datos y variables globales.
 //******************************************************************************
@@ -38,6 +40,9 @@ struct _voz // Estructura para almacenar los datos de las voces
 //   Inicializa el sistema de audio y carga los ficheros de sonidos y música.
 //******************************************************************************
 void ini_audio(void) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   reserve_voices(16, 0);
 
   install_sound(DIGI_AUTODETECT, MIDI_NONE, NULL);
@@ -54,6 +59,9 @@ void ini_audio(void) {
 //   Descarga los ficheros de sonidos y música.
 //******************************************************************************
 void fin_audio(void) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (musica_sonando >= 0)
     FMOD_Sound_Release(sm);
   FMOD_System_Close(sistema);
@@ -67,6 +75,9 @@ void fin_audio(void) {
 //   Inicia la reproducción del fichero de música n.
 //******************************************************************************
 void reproducir_musica(char n) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (vol_mus) {
     FMOD_System_Update(sistema);
     if (musica_sonando != n && n >= 0) {
@@ -98,6 +109,9 @@ void reproducir_musica(char n) {
 //   Modifica el volúmen de la música.
 //******************************************************************************
 void modificar_volmus(unsigned char vol) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (vol <= 100) {
     vol_mus = vol;
     vol_mus /= 100;
@@ -116,6 +130,9 @@ void modificar_volmus(unsigned char vol) {
 //   Detiene la música que se esté reproduciendo.
 //******************************************************************************
 void parar_musica(void) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (musica_sonando >= 0) {
     FMOD_Sound_Release(sm);
     musica_sonando = -1;
@@ -129,6 +146,9 @@ void parar_musica(void) {
 //   una sola vez.
 //******************************************************************************
 void musica_fin(void *msc_fin_void, unsigned int long_msc_fin_void) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   msc_fin = (const char *)msc_fin_void;
   long_msc_fin = long_msc_fin_void;
 }
@@ -138,6 +158,9 @@ void musica_fin(void *msc_fin_void, unsigned int long_msc_fin_void) {
 //   Reproduce el sonido indicado, con la opción de buclearlo.
 //******************************************************************************
 char reproducir_sonido(char sonido, char bucle) {
+  if (globalLuisSonidoDesactivado)
+    return -1;
+
   return rep_snd_onda(NULL, sonido, bucle);
 }
 
@@ -146,6 +169,9 @@ char reproducir_sonido(char sonido, char bucle) {
 //   Reproduce el sample indicado, con la opción de buclearlo.
 //******************************************************************************
 char reproducir_onda(SAMPLE *onda, char bucle) {
+  if (globalLuisSonidoDesactivado)
+    return -1;
+
   return rep_snd_onda(onda, 0, bucle);
 }
 
@@ -155,6 +181,9 @@ char reproducir_onda(SAMPLE *onda, char bucle) {
 //******************************************************************************
 char rep_snd_onda(SAMPLE *onda, char sonido, char modo) {
   char f = -1;
+
+  if (globalLuisSonidoDesactivado)
+    return -1;
 
   if (!vol_son)
     return -1;
@@ -194,6 +223,9 @@ char rep_snd_onda(SAMPLE *onda, char sonido, char modo) {
 void pausar_sonidos(void) {
   char f;
 
+  if (globalLuisSonidoDesactivado)
+    return;
+
   for (f = 0; f < 16; f++)
     if (voz[f].activa) {
       if (voz[f].activa == 1 ||
@@ -213,6 +245,9 @@ void pausar_sonidos(void) {
 void reanudar_sonidos(void) {
   char f;
 
+  if (globalLuisSonidoDesactivado)
+    return;
+
   for (f = 0; f < 16; f++)
     if (voz[f].activa)
       voice_start(voz[f].v);
@@ -223,6 +258,9 @@ void reanudar_sonidos(void) {
 //   Vuelve a colocar un sonido al principio.
 //******************************************************************************
 void reiniciar_sonido(char vz) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (vz >= 0)
     if (voz[vz].activa)
       voice_set_position(voz[vz].v, 0);
@@ -233,6 +271,9 @@ void reiniciar_sonido(char vz) {
 //   Modifica el volúmen máximo de los sonidos.
 //******************************************************************************
 void modificar_volson(unsigned char vol, char vz) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   float fvol = vol * 2.55;
   vol_son = (unsigned char)fvol;
   if (vz >= 0)
@@ -244,6 +285,9 @@ void modificar_volson(unsigned char vol, char vz) {
 //   Detiene un sonido determinado.
 //******************************************************************************
 void detener_sonido(char vz) {
+  if (globalLuisSonidoDesactivado)
+    return;
+
   if (vz >= 0)
     if (voz[vz].activa) {
       deallocate_voice(voz[vz].v);
@@ -257,6 +301,9 @@ void detener_sonido(char vz) {
 //******************************************************************************
 void detener_sonidos(char todos) {
   char f;
+  if (globalLuisSonidoDesactivado)
+    return;
+
   for (f = 0; f < 16; f++)
     if (voz[f].activa > 0 && (voz[f].activa < 3 || todos)) {
       deallocate_voice(voz[f].v);
