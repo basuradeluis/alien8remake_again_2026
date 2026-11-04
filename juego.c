@@ -158,6 +158,7 @@ char sonido_interferencia;
 char sonido_empujar;
 char sonido_autom;
 char trampas;
+char inmune = 0;
 
 void mov_nacho_andar(char f);
 void mov_nacho_saltar(char f);
@@ -295,6 +296,7 @@ char juego(void) {
   char f; //,tmp=1;
   int terminar = 0;
   int pulsadoActivarTrampas = 0;
+  int pulsadoActivarInmune = 0;
 
   puede_saltar = trampas = 0;
   dt_anim_nacho.cont = dt_anim_nacho.fot = dt_anim_nacho.tipo =
@@ -334,6 +336,14 @@ char juego(void) {
       pulsadoActivarTrampas = 0;
     }
 
+    if ((pulsadoActivarInmune == 0) && (key[KEY_7]) && (key[KEY_F12])) {
+      inmune = (inmune + 1) % 2;
+      pulsadoActivarInmune = 1;
+    }
+    if (!(key[KEY_7]) && !(key[KEY_F12])) {
+      pulsadoActivarInmune = 0;
+    }
+
     for (f = 0; f < num_movs; f++)
       movs[f].mover(f);
     if (sonido_empujar)
@@ -345,6 +355,13 @@ char juego(void) {
     if (key[KEY_F11]) {
       salidaInmediata = 1;
       terminar = 1;
+    }
+    if (inmune) {
+      textprintf_ex(buffer, font, 450, 60, color1, color2, "INMUNE ON ");
+      ism_cambiar_dato_objeto(movs[0].id, D_TRANSP, 30, CAMBIAR);
+    } else {
+      textprintf_ex(buffer, font, 450, 60, color1, color2, "           ");
+      ism_cambiar_dato_objeto(movs[0].id, D_TRANSP, 0, CAMBIAR);
     }
     if (trampas) {
       textprintf_ex(buffer, font, 100, 60, color1, color2, "TRAMPAS ON ");
@@ -3611,8 +3628,16 @@ void mov_nacho_fotograma(void) {
     } else if (dt_anim_nacho.fot == 8) {
       reproducir_sonido(25, PLAYMODE_PLAY);
     }
-    ism_cambiar_mapa_objeto(
-        movs[0].id, fm_nacho(movs[0].dir, fot_nacho[dt_anim_nacho.fot]));
+
+    if (inmune) {
+      ism_cambiar_mapa_objeto(
+          movs[0].id, fm_nacho(movs[0].dir, fot_nacho[dt_anim_nacho.fot]));
+      // Sprite de Sabreman (objetos 140-143), uno por direccion.
+      // ism_cambiar_mapa_objeto(movs[0].id, f_anim[140 + movs[0].dir].dat);
+    } else {
+      ism_cambiar_mapa_objeto(
+          movs[0].id, fm_nacho(movs[0].dir, fot_nacho[dt_anim_nacho.fot]));
+    }
     dt_anim_nacho.fot = (dt_anim_nacho.fot == 16 ? 0 : dt_anim_nacho.fot + 1);
   }
 }
@@ -3699,8 +3724,16 @@ void mov_nacho_girar(char f) {
 //******************************************************************************
 // Función mov_nacho_explotar(...)
 //    Secuencia de la explosión de Nacho.
+//    El parametro f selecciona el modo:
+//      f = 1: inicia la explosion (lo llaman las colisiones).
+//      f = 0: avanza un fotograma (lo llama el bucle de movimiento,
+//             que pasa el indice del objeto; Nacho es movs[0]).
+//    Luis: parece que es llamada con 1 siempre, tras comprobar colisiones.
+//       Y luego con 0 automaticamente
 //******************************************************************************
 void mov_nacho_explotar(char f) {
+  if (inmune)
+    return;
   if (f) {
     if (movs[0].mover != mov_nacho_explotar) {
       if (movs[0].mover == mov_nacho_girar)
@@ -3713,6 +3746,7 @@ void mov_nacho_explotar(char f) {
     }
   } else {
     dt_anim_nacho.cont++;
+    // Fase de giro y explosion: cambia el sprite y suena la explosion.
     if (dt_anim_nacho.cont < 60) {
       if (dt_anim_nacho.cont < 41 && dt_anim_nacho.cont % 10 == 0)
         reproducir_sonido(1, PLAYMODE_PLAY);
@@ -3732,9 +3766,11 @@ void mov_nacho_explotar(char f) {
       if (dt_anim_nacho.cont > 50)
         ism_cambiar_dato_objeto(movs[0].id, D_TRANSP, 10, SUMAR);
     } else if (dt_anim_nacho.cont == 60) {
+      // Nacho desaparece del mapa.
       ism_quitar_objeto(movs[0].id);
       movs[0].id = NO_ID;
     } else if (dt_anim_nacho.cont == 120) {
+      // Fin de la animacion: resta una vida y recarga la habitacion.
       detener_sonidos(1);
       parar_musica();
       for (f = 0; f < 60; f++)
