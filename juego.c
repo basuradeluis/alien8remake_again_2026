@@ -87,6 +87,7 @@ void ini_partida(void);
 #define ROBS_0 133
 #define LLAVE_0 72
 #define NUMS_AL_0 121
+#define FRAME_DISPARO 138
 #define fm_telebot(_N_) (BITMAP *)(f_anim[TLBT_0 + _N_].dat)
 #define fm_robotal(_N_, _F_) (BITMAP *)(f_anim[RBAL_0 + _N_ * 5 + _F_].dat)
 #define fm_minat(_N_) (BITMAP *)(f_anim[MINA_0 + _N_].dat)
@@ -104,11 +105,12 @@ void ini_partida(void);
 #define fm_llave(_T_, _N_) (BITMAP *)(f_anim[_N_ + LLAVE_0 + 1 + _T_ * 11].dat)
 #define fm_sombra_llave(_T_) (BITMAP *)(f_anim[_T_ * 11 + LLAVE_0].dat)
 #define fm_nums_al(_T_) (BITMAP *)(f_anim[_T_ + NUMS_AL_0 + oscuridad * 2].dat)
+#define fm_disparo() (BITMAP *)(f_anim[FRAME_DISPARO].dat)
 
-// 2999 / 10 : aprox 300 fotogramas
-// 300 fotogramas / 60 fps = 5 segundos
+// 5999 / 10 : duracion aprox 600 fotogramas
+// 600 fotogramas / 60 fps = 10 segundos
 // TICKS 60 = 60 fotogramas por segundo
-#define DURACION_TABURETE 2999
+#define DURACION_TABURETE 5999
 
 // Datos para los objetos con función de movimiento.
 // La posición 0 está reservada para Nacho.
@@ -208,6 +210,8 @@ char pausa(void);
 void reprogramar(void);
 void detener_nave(void);
 void mostrar_resultado(void);
+void crearDisparo(void);
+void moverDisparo(char f);
 void crearTaburete(void);
 void moverTaburete(char f);
 
@@ -320,6 +324,7 @@ char juego(void) {
   int pulsadoDibujarLineas = 0;
   int mostrarDebug = 0;
   int pulsadoMostrarDebug = 0;
+  int pulsadoF10 = 0;
   int pulsadoF9 = 0;
 
   puede_saltar = trampas = 0;
@@ -435,6 +440,14 @@ char juego(void) {
       }
     }
 
+    if ((pulsadoF10 == 0) && (key[KEY_F10])) {
+      pulsadoF10 = 1;
+      crearDisparo();
+    }
+    if (!key[KEY_F10]) {
+      pulsadoF10 = 0;
+    }
+
     if ((pulsadoF9 == 0) && (key[KEY_F9])) {
       pulsadoF9 = 1;
       crearTaburete();
@@ -536,6 +549,124 @@ char juego(void) {
 }
 
 //******************************************************************************
+// Funcion crearDisparo()
+//    Crea un disparo delante de Nacho.
+//    Anadido en 2016; restaurado en el codigo actual en 2026.
+//******************************************************************************
+void crearDisparo(void) {
+  int posX, posY, posZ;
+  int dirNacho = movs[0].dir;
+  ism_id nuevoId;
+
+  ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
+
+  switch (dirNacho) {
+  case 1:
+    posY = posY + ANCHO_CELDA;
+    break;
+  case 3:
+    posY = posY - ANCHO_CELDA;
+    break;
+  case 2:
+    posX = posX - ANCHO_CELDA;
+    break;
+  case 0:
+    posX = posX + ANCHO_CELDA;
+    break;
+  }
+  printf("Creando disparo en %d %d %d, dir %d\n", posX, posY, posZ, dirNacho);
+
+  nuevoId = ism_colocar_objeto_libre(posX, posY, posZ + 2, 6, 6, 8,
+                                     fm_disparo(), NULL);
+  if (nuevoId == ID_ERROR) {
+    printf("Error al crear disparo\n");
+    puts(ism_desc_error());
+    return;
+  }
+
+  movs[num_movs].id = nuevoId;
+
+  movs[num_movs].m0 = 0; // Duracion del disparo.
+  movs[num_movs].m1 = 0;
+  movs[num_movs].empujable = 0;
+  movs[num_movs].anclado = NO_ID;
+  movs[num_movs].dir = dirNacho;
+  movs[num_movs].mover = moverDisparo;
+  num_movs++;
+
+  reproducir_sonido(12, PLAYMODE_PLAY);
+}
+
+//******************************************************************************
+// Funcion moverDisparo()
+//    Mueve el disparo y destruye lo que choque con el.
+//    Anadido en 2016; restaurado en el codigo actual en 2026.
+//******************************************************************************
+void moverDisparo(char f) {
+  unsigned char datoACambiar; // Eje que se va a cambiar.
+  int valor = 0;
+  int rc = 0, numColisiones, i, j, k, destruir;
+
+  if (movs[f].m0 >= 2999)
+    return;
+
+  if ((movs[f].dir == 1) || (movs[f].dir == 3))
+    datoACambiar = D_Y;
+  else
+    datoACambiar = D_X;
+
+  if ((movs[f].dir == 1) || (movs[f].dir == 0))
+    valor = 2;
+  else
+    valor = -2;
+
+  rc = ism_cambiar_dato_objeto(movs[f].id, datoACambiar, valor, SUMAR);
+  if (rc) {
+    numColisiones = ism_num_colisiones();
+
+    for (i = 0; i < numColisiones; i++) {
+      ism_id idColisionActual = ism_extraer_id_blq();
+      destruir = 0;
+
+      // Comprobamos si hemos chocado con un obstaculo.
+      for (j = 0; j < num_obst; j++) {
+        if (id_obst[j] == idColisionActual) {
+          puts("Disparo choco con un obstaculo");
+          // FALTARIA KITARLO DEL ARRAY DE OBSTACULOS O AL MENOS NO MARCARLO?
+          destruir = 1;
+        }
+      }
+
+      // Comprobamos si hemos chocado con un objeto movible.
+      for (k = 0; k < num_movs; k++) {
+        if (movs[k].id == idColisionActual) {
+          movs[k].mover = NULL;
+          puts("Disparo choco con un obj movible");
+          destruir = 1;
+        }
+      }
+
+      if (destruir) {
+        rc = ism_quitar_objeto(idColisionActual);
+        if (rc) {
+          puts("kaske al desaparecer obstaculo");
+          puts(ism_desc_error());
+        }
+      }
+    }
+
+    // Destruimos el objeto disparo.
+    movs[f].m0 = 9999;
+    rc = ism_quitar_objeto(movs[f].id);
+    if (rc) {
+      puts("kaske al desaparecer disparo");
+      puts(ism_desc_error());
+    }
+    movs[f].mover = NULL;
+  }
+}
+
+//******************************************************************************
 // Funcion crearTaburete()
 //    Crea un taburete auxiliar delante de Nacho.
 //    Anadido en 2016; restaurado en el codigo actual en 2026.
@@ -582,7 +713,7 @@ void crearTaburete(void) {
   num_movs++;
 
   reproducir_sonido(5, PLAYMODE_PLAY);
-  printf("Taburete auxiliar generado (5 segundos duracion) (%d)\n", num_movs);
+  printf("Taburete auxiliar generado (10 segundos duracion) (objetos movibles %d [max 40])\n", num_movs);
 }
 
 //******************************************************************************

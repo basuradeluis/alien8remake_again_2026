@@ -57,7 +57,8 @@ void checkParameters(int argc, char *argv[]) {
        "del juego");
   puts("-jugar: saltar menu principal y empezar a jugar directamente");
 
-  puts("\nPulsar F1-F4 al pulsar 'Comenzar': escogerhabitacion inicial (5,42,90,113)");
+  puts("\nPulsar F1-F4 al pulsar 'Comenzar': escogerhabitacion inicial "
+       "(5,42,90,113)");
   puts("Pulsa Av Pag en la pantalla de opciones para activar un marcador "
        "alternativo");
 
