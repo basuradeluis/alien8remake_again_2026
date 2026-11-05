@@ -105,6 +105,11 @@ void ini_partida(void);
 #define fm_sombra_llave(_T_) (BITMAP *)(f_anim[_T_ * 11 + LLAVE_0].dat)
 #define fm_nums_al(_T_) (BITMAP *)(f_anim[_T_ + NUMS_AL_0 + oscuridad * 2].dat)
 
+// 2999 / 10 : aprox 300 fotogramas
+// 300 fotogramas / 60 fps = 5 segundos
+// TICKS 60 = 60 fotogramas por segundo
+#define DURACION_TABURETE 2999
+
 // Datos para los objetos con función de movimiento.
 // La posición 0 está reservada para Nacho.
 // Las posiciones 1 y 2 están reservadas para las llaves.
@@ -203,6 +208,8 @@ char pausa(void);
 void reprogramar(void);
 void detener_nave(void);
 void mostrar_resultado(void);
+void crearTaburete(void);
+void moverTaburete(char f);
 
 // Datos y función para los dígitos del contador de años luz
 unsigned char pos_a_luz[4], dec_pos_a_luz, oscuridad;
@@ -313,6 +320,7 @@ char juego(void) {
   int pulsadoDibujarLineas = 0;
   int mostrarDebug = 0;
   int pulsadoMostrarDebug = 0;
+  int pulsadoF9 = 0;
 
   puede_saltar = trampas = 0;
   dt_anim_nacho.cont = dt_anim_nacho.fot = dt_anim_nacho.tipo =
@@ -381,7 +389,8 @@ char juego(void) {
     // MOVER LOS OBJETOS MOVIBLES(INCLUYENDO LOSETAS QUE YA HAN DESAPARECIDO,
     // CERRADURAS,LOSETAS Q SE MUEVEN...
     for (f = 0; f < num_movs; f++)
-      movs[f].mover(f);
+      if (movs[f].mover != NULL)
+        movs[f].mover(f);
     /**************************************************************************/
     if (sonido_empujar)
       sonido_empujar--;
@@ -425,6 +434,15 @@ char juego(void) {
         line(buffer, ceroX, ceroY, v22_x, v22_y, makecol(255, 0, 0));
       }
     }
+
+    if ((pulsadoF9 == 0) && (key[KEY_F9])) {
+      pulsadoF9 = 1;
+      crearTaburete();
+    }
+    if (!key[KEY_F9]) {
+      pulsadoF9 = 0;
+    }
+
     int color1, color2;
     color1 = makecol(255, 255, 0);
     color2 = makecol(0, 0, 0);
@@ -515,6 +533,94 @@ char juego(void) {
 
   return (terminar || trampas || dt_partida.cerraduras == 0 ? EST_MENU
                                                             : EST_PREGUNTAR);
+}
+
+//******************************************************************************
+// Funcion crearTaburete()
+//    Crea un taburete auxiliar delante de Nacho.
+//    Anadido en 2016; restaurado en el codigo actual en 2026.
+//******************************************************************************
+void crearTaburete(void) {
+  int posX, posY, posZ;
+  int dirNacho = movs[0].dir;
+  ism_id nuevoId;
+
+  ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
+
+  switch (dirNacho) {
+  case 1:
+    posY = posY + ANCHO_CELDA;
+    break;
+  case 3:
+    posY = posY - ANCHO_CELDA;
+    break;
+  case 2:
+    posX = posX - ANCHO_CELDA;
+    break;
+  case 0:
+    posX = posX + ANCHO_CELDA;
+    break;
+  }
+
+  nuevoId = ism_colocar_objeto_libre(posX, posY, posZ + 1, ANCHO_CELDA - 1,
+                                     ANCHO_CELDA - 1, ALTURA_BASE,
+                                     fm_nacho_aplastado(), NULL);
+  if (nuevoId == ID_ERROR) {
+    printf("Error al crear taburete\n");
+    puts(ism_desc_error());
+    return;
+  }
+
+  movs[num_movs].id = nuevoId;
+
+  movs[num_movs].m0 = 0; // Duracion del taburete.
+  movs[num_movs].m1 = 0;
+  movs[num_movs].empujable = 0;
+  movs[num_movs].anclado = NO_ID;
+  movs[num_movs].dir = dirNacho;
+  movs[num_movs].mover = moverTaburete;
+  num_movs++;
+
+  reproducir_sonido(5, PLAYMODE_PLAY);
+  printf("Taburete auxiliar generado (5 segundos duracion) (%d)\n", num_movs);
+}
+
+//******************************************************************************
+// Funcion moverTaburete()
+//    Mueve el taburete auxiliar hasta que termina su duracion.
+//    Anadido en 2016; restaurado en el codigo actual en 2026.
+//******************************************************************************
+void moverTaburete(char f) {
+  unsigned char datoACambiar; // Eje que se va a cambiar.
+  int valor = 0;
+  int rc;
+
+  if (movs[f].m0 >= DURACION_TABURETE)
+    return;
+
+  if ((movs[f].dir == 1) || (movs[f].dir == 3))
+    datoACambiar = D_Y;
+  else
+    datoACambiar = D_X;
+
+  if ((movs[f].dir == 1) || (movs[f].dir == 0))
+    valor = 2;
+  else
+    valor = -2;
+
+  ism_cambiar_dato_objeto(movs[f].id, datoACambiar, valor, SUMAR);
+
+  movs[f].m0 = movs[f].m0 + 10;
+  if (movs[f].m0 >= DURACION_TABURETE) {
+    rc = ism_quitar_objeto(movs[f].id);
+    if (rc) {
+      puts("Error al eliminar el taburete");
+      puts(ism_desc_error());
+    } else {
+      printf("Taburete auxiliar desaparecido\n");
+    }
+    movs[f].mover = NULL;
+  }
 }
 
 //******************************************************************************
@@ -2672,12 +2778,14 @@ void mov_rbal_l(char f) {
       if (movs[f].g < -1)
         reproducir_sonido(8 + rand() % 4, PLAYMODE_PLAY);
       do {
-        if (ism_cambiar_dato_objeto(movs[f].id, D_Z, -1, SUMAR))
+        if (ism_cambiar_dato_objeto(movs[f].id, D_Z, -1, SUMAR)) {
           if (ism_colisionado_con(ID_SUELO)) {
             ism_cambiar_sombra_objeto(movs[f].id, NULL);
             movs[f].g = 1;
-          } else
+          } else {
             movs[f].g = 0;
+          }
+        }
       } while (movs[f].g < 0);
     } else
       movs[f].g--;
@@ -4011,12 +4119,14 @@ char anclar(char f) {
   // vaya hacia arriba, o con el último si todos van hacia abajo.
   for (n = 6; n < num_movs; n++) {
     if (movs[n].mover == mov_z_autom) {
-      if (ism_colisionado_con(movs[n].id))
+      if (ism_colisionado_con(movs[n].id)) {
         if (movs[n].dir > 0) {
           movs[f].anclado = movs[n].id;
           return 0;
-        } else
+        } else {
           id_a = movs[n].id;
+        }
+      }
     }
   }
   if (id_a != NO_ID) {

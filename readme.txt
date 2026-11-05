@@ -1,9 +1,9 @@
 Recompilation and update of
-Alien 8 2008 remake by Ignacio Perez Gil and D-o-S (2008)
+Alien 8 2008 remake by Ignacio Perez Gil and D-o-S (2008) for Retrospec
 
 
 Recompilation and update author: Basuradeluis
-2026
+2026 (and 2016)
 
 
 Based on:
@@ -45,7 +45,17 @@ First compile the .c files into .o files:
 gcc -c *.c
 
 Then, link them:
-gcc *.o -o mi_programa -lalleg -lcurl -lfmod
+gcc *.o -o executable -lalleg -lcurl -lfmod
 
-The .dat files must be next to the generated executable created. If not and full screen mode enabled, probably a black scren with no error will be shown. Use Ctrl+Alt+F3 to kill the program. Go back to initial (Ctrl+Alt+F2) and readjust your screen resolution.
+Run the executable in a terminal, if possible.
+
+The .dat files must be next to the generated executable created. If not and full screen mode enabled, probably a black scren with no error will be shown. In linux, use Ctrl+Alt+F3 to kill the program. Go back to initial (Ctrl+Alt+F2) and readjust your screen resolution.
 Changed the game, so if no initial configuration exists, use window mode as default (to prevent issues with higher resolutions and black screens)
+
+The anims.dat file was modified adding some extra images. Use the included in this package.
+Use grabber program (instaled with allegro library devel) to examine/modify the dat files.
+++
+Things added:
+Parameters.
+Some cheats (inmunity was already present).
+
