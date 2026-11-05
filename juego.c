@@ -383,6 +383,15 @@ char juego(void) {
 
     if ((pulsadoDibujarLineas == 0) && (key[KEY_8]) && (key[KEY_F12])) {
       dibujarLineas = (dibujarLineas + 1) % 2;
+      if (!dibujarLineas) {
+        // IDEA IA para quitar las lineas dibujadas en el acto,
+        //en vez de salir y volver a entrar:El motor solo repinta los rectangulos sucios, asi que las lineas
+        // ya dibujadas se quedarian en buffer. Forzamos un repintado
+        // completo del mundo.
+        clear_bitmap(buffer);
+        ism_habilitar_rect_sucio(0);
+        ism_habilitar_rect_sucio(1);
+      }
       pulsadoDibujarLineas = 1;
     }
     if (!(key[KEY_8]) && !(key[KEY_F12])) {
