@@ -558,6 +558,12 @@ void crearDisparo(void) {
   int dirNacho = movs[0].dir;
   ism_id nuevoId;
 
+  if (num_movs >= MAX_MOVS) {
+    printf("Limite de objetos movibles alcanzado (%d/%d)\n", num_movs,
+           MAX_MOVS);
+    return;
+  }
+
   ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
 
   switch (dirNacho) {
@@ -676,6 +682,12 @@ void crearTaburete(void) {
   int dirNacho = movs[0].dir;
   ism_id nuevoId;
 
+  if (num_movs >= MAX_MOVS) {
+    printf("Limite de objetos movibles alcanzado (%d/%d)\n", num_movs,
+           MAX_MOVS);
+    return;
+  }
+
   ism_obtener_coords_objeto(movs[0].id, &posX, &posY, &posZ);
 
   switch (dirNacho) {
@@ -713,7 +725,9 @@ void crearTaburete(void) {
   num_movs++;
 
   reproducir_sonido(5, PLAYMODE_PLAY);
-  printf("Taburete auxiliar generado (10 segundos duracion) (objetos movibles %d [max 40])\n", num_movs);
+  printf("Taburete auxiliar generado (10 segundos duracion) (objetos movibles "
+         "%d [max 40])\n",
+         num_movs);
 }
 
 //******************************************************************************
