@@ -895,10 +895,14 @@ char preguntar(void) {
     salpnt = fopen("scores.txt", "a");
   } else {
     salpnt = fopen("scores.txt", "a");
-    fputs("CA CSV EXP LYRS               CODE", salpnt);
-    putc(0x0d, salpnt);
-    putc(0x0a, salpnt);
+    if (salpnt) {
+      fputs("CA CSV EXP LYRS               CODE", salpnt);
+      putc(0x0d, salpnt);
+      putc(0x0a, salpnt);
+    }
   }
+  if (!salpnt)
+    puts("No se pudo abrir scores.txt");
 
   reproducir_musica(0);
   linea[0] += puntuaciones[0] / 10;
@@ -917,10 +921,12 @@ char preguntar(void) {
   linea[13] += (puntuaciones[3] % 100) / 10;
   linea[14] += puntuaciones[3] % 10;
 
-  fputs(linea, salpnt);
-  putc(0x0d, salpnt);
-  putc(0x0a, salpnt);
-  fclose(salpnt);
+  if (salpnt) {
+    fputs(linea, salpnt);
+    putc(0x0d, salpnt);
+    putc(0x0a, salpnt);
+    fclose(salpnt);
+  }
   reproducir_musica(0);
 
   contador = 0;
@@ -1452,6 +1458,11 @@ void leer_cfg(void) {
 void escribir_cfg(void) {
   PACKFILE *cfg = pack_fopen("cfg.dat", F_WRITE);
   char f;
+
+  if (!cfg) {
+    puts("No se pudo abrir cfg.dat para escritura");
+    return;
+  }
 
   pack_fwrite(&idioma, sizeof(char), cfg);
   pack_fwrite(&volson, sizeof(char), cfg);
