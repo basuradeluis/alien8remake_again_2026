@@ -22,10 +22,10 @@ alien8_win/
 isomot/  
 
 ## Acerca del motor (Isomot):
-Mira la carpeta demo de Isomot y su html. El código fuente se puede descargar desde aquí (https://retrospec.sgn.net/info.htm?id=isomot&t=u)  
-El original precompilado exe para windows corre demasiado rápido en un Wine bajo Linux moderno con CPUs. Y bajo Linux incluso recompilado, probablemente porque no tiene límite de FPS/velocidad.  
+Mira la carpeta demo de Isomot y su html. El código fuente se puede descargar desde aquí (https://retrospec.sgn.net/info.htm?id=isomot&t=u).  
+El ejecutable original precompilado para Windows corre demasiado rápido bajo Wine en Linux con CPUs modernas. Y en Linux también, incluso recompilado; probablemente porque no tiene límite de FPS/velocidad.  
 
-Para compilarlos bajo Linux, copia los archivos de Isomot (.c .h y ism_lng.h) junto a los archivos .c de demo (o viceversa).  
+Para compilarlos bajo Linux, copia los archivos de Isomot (.c, .h y ism_lng.h) junto a los archivos .c de demo (o viceversa).  
 Después compila los .c con:  
 
 ```bash
@@ -45,7 +45,7 @@ Se necesita la librería de desarrollo de Allegro 4. También la librería curl 
 sudo apt install liballegro4-dev build-essential libasound2-dev libcurl4-openssl-dev
 ```  
 
-Para el sonido se usa la librería [FMOD library](https://www.fmod.com). Para descargarla, regístrate en la página web de FMOD y descarga el FMOD Engine (para la Core API). Descarga la versión 2.03.15 para Linux. Otras versiones puede que funcionen también. Ten en cuenta que algunas librerías FMOD pueden necesitar pequeños cambios.  
+Para el sonido se usa la librería [FMOD](https://www.fmod.com). Para descargarla, regístrate en la página web de FMOD y descarga el FMOD Engine (para la Core API). Descarga la versión 2.03.15 para Linux. Otras versiones puede que funcionen también. Ten en cuenta que algunas librerías FMOD pueden necesitar pequeños cambios.  
 
 Después haz lo siguiente:  
 
@@ -62,9 +62,9 @@ Mira también las etiquetas de git 'OriginalSourceCode' y 'FMODFixes'.
 ## Algunos cambios al código original para compilarlo:  
 - Arreglos en el archivo internet.c para usar la versión de Linux de curl según tu Sistema Operativo (internet.c tiene un #DEFINE para los distintos SO)  
 - Arreglos de algunos problemas de librerías FMOD viejas (mira el tag 'FMODFixes' en el historial de git)  
-    Añadir FMOD_VERSION in  FMOD_System_Create(&sistema, FMOD_VERSION);  
+    Añadir FMOD_VERSION en FMOD_System_Create(&sistema, FMOD_VERSION);  
     Y otros arreglos debido a cambios en la librería FMOD  
-- Arreglos en juego.c con algunos problemas de C/C++. Lvalues y Rvalues. Undef no tiene parametros  
+- Arreglos en juego.c con algunos problemas de C/C++. Lvalues y Rvalues. Undef no tiene parámetros  
 
 Sugerencias para compilar el juego:  
 Primero compila los .c en .o:  
